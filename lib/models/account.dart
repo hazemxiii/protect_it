@@ -74,4 +74,19 @@ class AccountNotifier extends ChangeNotifier {
     accounts.add(account);
     notifyListeners();
   }
+
+  void setSensitive(Attribute attribute, bool v) {
+    attribute.updateSensitivity(v);
+    notifyListeners();
+  }
+
+  void setMain(Account account, String key) {
+    account.mainKey = key;
+    notifyListeners();
+  }
+
+  void setSec(Account account, String key) {
+    account.secKey = key;
+    notifyListeners();
+  }
 }

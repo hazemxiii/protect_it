@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protect_it/account_details.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,8 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         onPressed: () {
           Provider.of<AccountNotifier>(context, listen: false).addAccount(
               Account(
@@ -62,49 +65,64 @@ class AccountWidget extends StatefulWidget {
   State<AccountWidget> createState() => _AccountWidgetState();
 }
 
+// TODO: fix set sensitivity button
+// TODO: set main and sec functionality
+// TODO: edit name and value
+// TODO: edit color
+
 class _AccountWidgetState extends State<AccountWidget> {
   bool isSensitiveShown = false;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            widget.account.name,
-            style: TextStyle(color: widget.account.color),
-          ),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: Color.lerp(Colors.white, widget.account.color, 0.1),
-                borderRadius: const BorderRadius.all(Radius.circular(5))),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _displayAttribute(widget.account.getMain),
-                    _displayAttribute(widget.account.getSec),
-                  ],
-                ),
-                IconButton(
-                    color: widget.account.color,
-                    onPressed: () {
-                      setState(() {
-                        isSensitiveShown = !isSensitiveShown;
-                      });
-                    },
-                    icon: Icon(isSensitiveShown
-                        ? Icons.visibility
-                        : Icons.visibility_off))
-              ],
+    return InkWell(
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) =>
+                Consumer<AccountNotifier>(builder: (context, accountNot, _) {
+                  return AccountDetailsPage(account: widget.account);
+                })));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.account.name,
+              style: TextStyle(color: widget.account.color),
             ),
-          ),
-        ],
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Color.lerp(Colors.white, widget.account.color, 0.1),
+                  borderRadius: const BorderRadius.all(Radius.circular(5))),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _displayAttribute(widget.account.getMain),
+                      _displayAttribute(widget.account.getSec),
+                    ],
+                  ),
+                  IconButton(
+                      color: widget.account.color,
+                      onPressed: () {
+                        setState(() {
+                          isSensitiveShown = !isSensitiveShown;
+                        });
+                      },
+                      icon: Icon(isSensitiveShown
+                          ? Icons.visibility
+                          : Icons.visibility_off))
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
