@@ -12,7 +12,7 @@ class Account {
     if (!keys.contains(mainKey)) {
       throw "Main Key Doesn't Exist";
     }
-    if (!keys.contains(secKey)) {
+    if (!keys.contains(secKey) && secKey != "") {
       throw "Secondary Key Doesn't Exist";
     }
   }
@@ -32,15 +32,29 @@ class Account {
   }
 
   void setMain(String mainKey) {
+    if (mainKey == secKey) {
+      secKey = this.mainKey;
+    }
     this.mainKey = mainKey;
   }
 
   void setSec(String secKey) {
-    this.secKey = secKey;
+    if (mainKey == secKey) {
+      mainKey = this.secKey;
+    }
+    if (this.secKey == secKey) {
+      this.secKey = "";
+    } else {
+      this.secKey = secKey;
+    }
+  }
+
+  bool isAttributeExist(String key) {
+    return attributes.keys.toList().contains(key);
   }
 
   Attribute get getMain => attributes[mainKey]!;
-  Attribute get getSec => attributes[secKey]!;
+  Attribute? get getSec => attributes[secKey];
 }
 
 class Attribute {
@@ -52,16 +66,12 @@ class Attribute {
   String value;
   bool isSensitive;
 
-  void updateName(String name) {
-    name = name;
-  }
-
   void updateValue(String value) {
-    value = value;
+    this.value = value;
   }
 
   void updateSensitivity(bool isSensitive) {
-    isSensitive = isSensitive;
+    this.isSensitive = isSensitive;
   }
 }
 
@@ -81,12 +91,37 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   void setMain(Account account, String key) {
-    account.mainKey = key;
+    account.setMain(key);
     notifyListeners();
   }
 
   void setSec(Account account, String key) {
-    account.secKey = key;
+    account.setSec(key);
+    notifyListeners();
+  }
+
+  void updateValue(String value, Attribute attr) {
+    attr.updateValue(value);
+    notifyListeners();
+  }
+
+  void updateAttrKey(Account account, String oldKey, String newKey) {
+    if (oldKey == newKey) {
+      return;
+    }
+    account.attributes[newKey] = account.attributes[oldKey]!;
+    if (account.mainKey == oldKey) {
+      account.setMain(newKey);
+    }
+    if (account.secKey == oldKey) {
+      account.setSec(newKey);
+    }
+    account.attributes.remove(oldKey);
+    notifyListeners();
+  }
+
+  void updateColor(Account account, Color c) {
+    account.color = c;
     notifyListeners();
   }
 }

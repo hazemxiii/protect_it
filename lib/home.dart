@@ -65,24 +65,13 @@ class AccountWidget extends StatefulWidget {
   State<AccountWidget> createState() => _AccountWidgetState();
 }
 
-// TODO: fix set sensitivity button
-// TODO: set main and sec functionality
-// TODO: edit name and value
-// TODO: edit color
-
 class _AccountWidgetState extends State<AccountWidget> {
   bool isSensitiveShown = false;
   @override
   Widget build(BuildContext context) {
     return InkWell(
       overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) =>
-                Consumer<AccountNotifier>(builder: (context, accountNot, _) {
-                  return AccountDetailsPage(account: widget.account);
-                })));
-      },
+      onTap: _openDetails,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         child: Column(
@@ -105,16 +94,13 @@ class _AccountWidgetState extends State<AccountWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _displayAttribute(widget.account.getMain),
-                      _displayAttribute(widget.account.getSec),
+                      if (widget.account.getSec != null)
+                        _displayAttribute(widget.account.getSec!),
                     ],
                   ),
                   IconButton(
                       color: widget.account.color,
-                      onPressed: () {
-                        setState(() {
-                          isSensitiveShown = !isSensitiveShown;
-                        });
-                      },
+                      onPressed: _toggleShowSensitive,
                       icon: Icon(isSensitiveShown
                           ? Icons.visibility
                           : Icons.visibility_off))
@@ -125,6 +111,20 @@ class _AccountWidgetState extends State<AccountWidget> {
         ),
       ),
     );
+  }
+
+  void _openDetails() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) =>
+            Consumer<AccountNotifier>(builder: (context, accountNot, _) {
+              return AccountDetailsPage(account: widget.account);
+            })));
+  }
+
+  void _toggleShowSensitive() {
+    setState(() {
+      isSensitiveShown = !isSensitiveShown;
+    });
   }
 
   Text _displayAttribute(Attribute atr) {
