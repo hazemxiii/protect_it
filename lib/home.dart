@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/account_details.dart';
 import 'package:protect_it/models/account.dart';
+import 'package:protect_it/service/account_notifier.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
@@ -93,9 +94,9 @@ class _AccountWidgetState extends State<AccountWidget> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _displayAttribute(widget.account.getMain),
-                      if (widget.account.getSec != null)
-                        _displayAttribute(widget.account.getSec!),
+                      _displayAttribute(widget.account.mainAttr),
+                      if (widget.account.secAttr != null)
+                        _displayAttribute(widget.account.secAttr!),
                     ],
                   ),
                   IconButton(

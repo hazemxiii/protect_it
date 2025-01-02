@@ -2,59 +2,73 @@ import 'package:flutter/material.dart';
 
 class Account {
   Account({
-    required this.name,
-    required this.attributes,
-    this.mainKey = "",
-    this.secKey = "",
-    this.color = Colors.black,
+    required String name,
+    required Map<String, Attribute> attributes,
+    String mainKey = "",
+    String secKey = "",
+    Color color = Colors.black,
   }) {
-    List<String> keys = attributes.keys.toList();
-    if (!keys.contains(mainKey)) {
+    _color = color;
+    _secKey = secKey;
+    _mainKey = mainKey;
+    _attributes = attributes;
+    _name = name;
+    List<String> keys = _attributes.keys.toList();
+    if (!keys.contains(_mainKey)) {
       throw "Main Key Doesn't Exist";
     }
-    if (!keys.contains(secKey) && secKey != "") {
+    if (!keys.contains(_secKey) && _secKey != "") {
       throw "Secondary Key Doesn't Exist";
     }
   }
 
-  String name;
-  String mainKey;
-  String secKey;
-  Color color;
-  Map<String, Attribute> attributes = {};
+  late String _name;
+  late String _mainKey;
+  late String _secKey;
+  late Color _color;
+  late Map<String, Attribute> _attributes = {};
 
   void addAttributes(Map<String, Attribute> attributes) {
-    this.attributes.addAll(attributes);
+    _attributes.addAll(attributes);
   }
 
   void deleteAttribute(String attributeName) {
-    attributes.remove(attributeName);
+    _attributes.remove(attributeName);
   }
 
   void setMain(String mainKey) {
-    if (mainKey == secKey) {
-      secKey = this.mainKey;
+    if (mainKey == _secKey) {
+      _secKey = _mainKey;
     }
-    this.mainKey = mainKey;
+    _mainKey = mainKey;
   }
 
   void setSec(String secKey) {
-    if (mainKey == secKey) {
-      mainKey = this.secKey;
+    if (_mainKey == secKey) {
+      _mainKey = _secKey;
     }
-    if (this.secKey == secKey) {
-      this.secKey = "";
+    if (_secKey == secKey) {
+      _secKey = "";
     } else {
-      this.secKey = secKey;
+      _secKey = secKey;
     }
   }
 
   bool isAttributeExist(String key) {
-    return attributes.keys.toList().contains(key);
+    return _attributes.keys.toList().contains(key);
   }
 
-  Attribute get getMain => attributes[mainKey]!;
-  Attribute? get getSec => attributes[secKey];
+  void updateColor(Color c) {
+    _color = c;
+  }
+
+  Attribute get mainAttr => _attributes[_mainKey]!;
+  Attribute? get secAttr => _attributes[_secKey];
+  String get name => _name;
+  Map<String, Attribute> get attributes => _attributes;
+  String get mainKey => _mainKey;
+  String get secKey => _secKey;
+  Color get color => _color;
 }
 
 class Attribute {
@@ -72,56 +86,5 @@ class Attribute {
 
   void updateSensitivity(bool isSensitive) {
     this.isSensitive = isSensitive;
-  }
-}
-
-class AccountNotifier extends ChangeNotifier {
-  AccountNotifier(this.accounts);
-
-  List<Account> accounts = [];
-
-  void addAccount(Account account) {
-    accounts.add(account);
-    notifyListeners();
-  }
-
-  void setSensitive(Attribute attribute, bool v) {
-    attribute.updateSensitivity(v);
-    notifyListeners();
-  }
-
-  void setMain(Account account, String key) {
-    account.setMain(key);
-    notifyListeners();
-  }
-
-  void setSec(Account account, String key) {
-    account.setSec(key);
-    notifyListeners();
-  }
-
-  void updateValue(String value, Attribute attr) {
-    attr.updateValue(value);
-    notifyListeners();
-  }
-
-  void updateAttrKey(Account account, String oldKey, String newKey) {
-    if (oldKey == newKey) {
-      return;
-    }
-    account.attributes[newKey] = account.attributes[oldKey]!;
-    if (account.mainKey == oldKey) {
-      account.setMain(newKey);
-    }
-    if (account.secKey == oldKey) {
-      account.setSec(newKey);
-    }
-    account.attributes.remove(oldKey);
-    notifyListeners();
-  }
-
-  void updateColor(Account account, Color c) {
-    account.color = c;
-    notifyListeners();
   }
 }
