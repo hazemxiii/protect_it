@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Account {
@@ -32,8 +34,25 @@ class Account {
     _attributes.addAll(attributes);
   }
 
-  void deleteAttribute(String attributeName) {
-    _attributes.remove(attributeName);
+  Attribute? deleteAttribute(String attributeName) {
+    if (attributeName == _mainKey) {
+      if (_attributes.length <= 1) {
+        return null;
+      }
+      List<String> attributes = _attributes.keys.toList();
+      attributes.remove(_mainKey);
+      if (_attributes.length == 1) {
+        _secKey = "";
+        _mainKey = attributes[0];
+      } else {
+        attributes.remove(_secKey);
+        _mainKey = attributes[Random().nextInt(attributes.length)];
+      }
+    }
+    if (attributeName == _secKey) {
+      _secKey = "";
+    }
+    return _attributes.remove(attributeName);
   }
 
   void setMain(String mainKey) {
@@ -60,6 +79,10 @@ class Account {
 
   void updateColor(Color c) {
     _color = c;
+  }
+
+  void updateName(String newName) {
+    _name = newName;
   }
 
   Attribute get mainAttr => _attributes[_mainKey]!;

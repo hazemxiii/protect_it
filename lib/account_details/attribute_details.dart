@@ -1,93 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:protect_it/account_details/account_details.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-
-class AccountDetailsPage extends StatelessWidget {
-  const AccountDetailsPage({super.key, required this.account});
-
-  final Account account;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.lerp(account.color, Colors.white, 0.9),
-      appBar: AppBar(
-        title: Text(account.name),
-        backgroundColor: account.color,
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        actions: [
-          InkWell(
-            onTap: () {
-              showColorPicker(context);
-            },
-            child: Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                  border: const Border.fromBorderSide(
-                      BorderSide(width: 3, color: Colors.white)),
-                  color: account.color,
-                  borderRadius: const BorderRadius.all(Radius.circular(999))),
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          height: MediaQuery.of(context).size.height,
-          child: GridView(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                mainAxisExtent: 200,
-                maxCrossAxisExtent: 250),
-            children: [
-              ...account.attributes.entries.map((e) {
-                return AttributeWidget(
-                  account: account,
-                  type: _getType(e.key),
-                  attr: e.value,
-                  attributeKey: e.key,
-                );
-              })
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void showColorPicker(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-              content: SingleChildScrollView(
-                child: ColorPicker(
-                    pickerColor: account.color,
-                    onColorChanged: (c) {
-                      Provider.of<AccountNotifier>(context, listen: false)
-                          .updateColor(account, c);
-                    }),
-              ),
-            ));
-  }
-
-  AttributeType _getType(String attributeKey) {
-    if (attributeKey == account.mainKey) {
-      return AttributeType.main;
-    }
-    if (attributeKey == account.secKey) {
-      return AttributeType.secondary;
-    }
-    return AttributeType.normal;
-  }
-}
-
-enum AttributeType { normal, main, secondary }
 
 class AttributeWidget extends StatefulWidget {
   final Attribute attr;
@@ -143,6 +58,10 @@ class _AttributeWidgetState extends State<AttributeWidget> {
             children: [
               IconButton(
                   color: widget.account.color,
+                  onPressed: _deleteAttribute,
+                  icon: const Icon(Icons.delete_outline_rounded)),
+              IconButton(
+                  color: widget.account.color,
                   onPressed: _showEditDialog,
                   icon: const Icon(Icons.edit))
             ],
@@ -179,6 +98,21 @@ class _AttributeWidgetState extends State<AttributeWidget> {
         ],
       ),
     );
+  }
+
+  void _deleteAttribute() {
+    if (accountProvider.deleteAttribute(widget.account, widget.attributeKey)) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            duration: const Duration(seconds: 10),
+            backgroundColor:
+                Color.lerp(Colors.white, widget.account.color, 0.1),
+            content: UndoWidget(
+              color: widget.account.color,
+            )),
+      );
+    }
   }
 
   Text _displayAttribute(bool isSensitive) {
@@ -316,5 +250,72 @@ class _AttributeWidgetState extends State<AttributeWidget> {
           widget.account, widget.attributeKey, nameController.text);
       Navigator.of(context).pop();
     }
+  }
+}
+
+class UndoWidget extends StatefulWidget {
+  final Color color;
+  const UndoWidget({super.key, required this.color});
+
+  @override
+  State<UndoWidget> createState() => _UndoWidgetState();
+}
+
+class _UndoWidgetState extends State<UndoWidget> with TickerProviderStateMixin {
+  int time = 0;
+  late Animation<double> _animation;
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    _animationController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 10));
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+    _animationController.addListener(() {
+      setState(() {});
+    });
+    _animationController.forward();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          color: widget.color,
+          borderRadius: const BorderRadius.all(Radius.circular(5))),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+              color: Colors.white,
+              onPressed: () {
+                Provider.of<AccountNotifier>(context, listen: false).undo();
+                ScaffoldMessenger.of(context).clearSnackBars();
+              },
+              icon: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Undo",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Icon(Icons.undo)
+                ],
+              )),
+          LinearProgressIndicator(
+            color: Colors.white,
+            backgroundColor: widget.color,
+            value: 1 - _animation.value,
+          )
+        ],
+      ),
+    );
   }
 }

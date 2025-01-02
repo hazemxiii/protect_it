@@ -5,6 +5,7 @@ class AccountNotifier extends ChangeNotifier {
   AccountNotifier(this.accounts);
 
   List<Account> accounts = [];
+  Map<String, dynamic> deleteAttributeData = {};
 
   void addAccount(Account account) {
     accounts.add(account);
@@ -48,6 +49,45 @@ class AccountNotifier extends ChangeNotifier {
 
   void updateColor(Account account, Color c) {
     account.updateColor(c);
+    notifyListeners();
+  }
+
+  void deleteAccount(Account account) {
+    accounts.remove(account);
+    notifyListeners();
+  }
+
+  void addAttribute(Account account) {
+    account.addAttributes({"newAttribute": Attribute(value: "value")});
+    notifyListeners();
+  }
+
+  bool deleteAttribute(Account account, String attributeKey) {
+    Attribute? attr = account.deleteAttribute(attributeKey);
+    if (attr == null) {
+      return false;
+    }
+    deleteAttributeData['account'] = account;
+    deleteAttributeData['attribute'] = attr;
+    deleteAttributeData['key'] = attributeKey;
+    notifyListeners();
+    return true;
+  }
+
+  void undo() {
+    Account? account = deleteAttributeData['account'];
+    String? key = deleteAttributeData['key'];
+    Attribute? attribute = deleteAttributeData['attribute'];
+    if (account != null && key != null && attribute != null) {
+      (deleteAttributeData['account'] as Account)
+          .addAttributes({key: attribute});
+    }
+    deleteAttributeData = {};
+    notifyListeners();
+  }
+
+  void updateName(Account account, String newName) {
+    account.updateName(newName);
     notifyListeners();
   }
 }
