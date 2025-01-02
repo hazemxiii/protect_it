@@ -57,9 +57,17 @@ class AccountNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addAttribute(Account account) {
-    account.addAttributes({"newAttribute": Attribute(value: "value")});
+  Map<String, Attribute> addAttribute(Account account) {
+    Attribute attr = Attribute(value: "value");
+    String name = "newAttribute";
+    List<String> names = account.attributes.keys.toList();
+    while (names.contains(name)) {
+      int number = int.tryParse(name[name.length - 1]) ?? 0;
+      name = "newAttribute_${number + 1}";
+    }
+    account.addAttributes({"newAttribute": attr});
     notifyListeners();
+    return {name: attr};
   }
 
   bool deleteAttribute(Account account, String attributeKey) {

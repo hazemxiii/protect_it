@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:protect_it/service/encryption.dart';
 
 class Account {
   Account({
@@ -29,6 +31,47 @@ class Account {
   late String _secKey;
   late Color _color;
   late Map<String, Attribute> _attributes = {};
+
+  String toJSON(String secret) {
+    Map<String, String> map = {};
+    map['name'] = encryptData(_name, secret);
+    map['color'] = _color.value.toString();
+    map['mainKey'] = encryptData(_mainKey, secret);
+    map['secKey'] = encryptData(_secKey, secret);
+    for (String attr in attributes.keys) {
+      map[encryptData(attr, secret)] = _attributes[attr]!.toJSON(secret);
+    }
+    return jsonEncode(map);
+  }
+
+  static Account? fromJSON(String json, String secret) {
+    try {
+      Map map = jsonDecode(json);
+      Map<String, Attribute> attributes = {};
+      String name = decryptData(map['name']!, secret);
+      Color color = Color(int.parse(map['color']!));
+      String mainKey = decryptData(map['mainKey']!, secret);
+      String secKey = decryptData(map['secKey']!, secret);
+      for (String key in map.keys) {
+        if (key.contains(":")) {
+          Attribute? attr = Attribute.fromJSON(map[key]!, secret);
+          if (attr == null) {
+            return null;
+          }
+          attributes[decryptData(key, secret)] = attr;
+        }
+      }
+
+      return Account(
+          name: name,
+          attributes: attributes,
+          mainKey: mainKey,
+          secKey: secKey,
+          color: color);
+    } catch (e) {
+      return null;
+    }
+  }
 
   void addAttributes(Map<String, Attribute> attributes) {
     _attributes.addAll(attributes);
@@ -102,6 +145,24 @@ class Attribute {
 
   String value;
   bool isSensitive;
+
+  String toJSON(String secret) {
+    Map<String, String> map = {};
+    map['sensitive'] = isSensitive.toString();
+    map['value'] = encryptData(value, secret);
+    return jsonEncode(map);
+  }
+
+  static Attribute? fromJSON(String json, String secret) {
+    try {
+      Map map = jsonDecode(json);
+      return Attribute(
+          value: decryptData(map['value']!, secret),
+          isSensitive: (map['sensitive']!) == "true");
+    } catch (e) {
+      return null;
+    }
+  }
 
   void updateValue(String value) {
     this.value = value;

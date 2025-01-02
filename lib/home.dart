@@ -13,18 +13,7 @@ class Home extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        onPressed: () {
-          Provider.of<AccountNotifier>(context, listen: false).addAccount(
-              Account(
-                  color: Colors.red,
-                  mainKey: "user",
-                  secKey: "pass",
-                  name: "valo",
-                  attributes: {
-                "user": Attribute(value: "hazemXIII"),
-                "pass": Attribute(value: "dispass", isSensitive: true)
-              }));
-        },
+        onPressed: () => _addAccount(context),
         child: const Icon(Icons.add),
       ),
       backgroundColor: Colors.white,
@@ -52,6 +41,24 @@ class Home extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _addAccount(BuildContext context) {
+    Account account = Account(
+        color: Colors.black,
+        mainKey: "userName",
+        secKey: "password",
+        name: "Account",
+        attributes: {
+          "userName": Attribute(value: "userName"),
+          "password": Attribute(value: "password", isSensitive: true)
+        });
+    Provider.of<AccountNotifier>(context, listen: false).addAccount(account);
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) =>
+            Consumer<AccountNotifier>(builder: (context, accountNotifier, _) {
+              return AccountDetailsPage(account: account);
+            })));
   }
 }
 

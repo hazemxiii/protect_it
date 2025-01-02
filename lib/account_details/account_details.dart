@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protect_it/account_details/attribute_custom_widgets.dart';
 import 'package:protect_it/account_details/attribute_details.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
@@ -49,9 +50,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
         foregroundColor: Colors.white,
         centerTitle: true,
         actions: [
-          _button(Icons.add, () {
-            accountNotifer.addAttribute(widget.account);
-          }),
+          _button(Icons.add, _showEditDialog),
           _button(Icons.delete_outline_rounded, _showDeleteDialog),
           _colorButton()
         ],
@@ -59,7 +58,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(10),
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height - 200,
           child: GridView(
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 crossAxisSpacing: 10,
@@ -80,6 +79,16 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
         ),
       ),
     );
+  }
+
+  void _showEditDialog() {
+    Map<String, Attribute> attr = accountNotifer.addAttribute(widget.account);
+    showDialog(
+        context: context,
+        builder: (_) => EditAttributeWidget(
+            attr: attr.values.toList()[0],
+            account: widget.account,
+            attrKey: attr.keys.toList()[0]));
   }
 
   void _onType(String? v) {

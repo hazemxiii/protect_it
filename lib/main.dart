@@ -23,25 +23,20 @@ class App extends StatelessWidget {
 }
 
 List<Account> accounts = [
-  Account(
-      color: Colors.blue,
-      mainKey: "email",
-      secKey: "password",
-      name: "Facebook",
-      attributes: {
-        "email": Attribute(
-          value: "face@book.com",
-        ),
-        "password": Attribute(value: "facepass", isSensitive: true),
-        "phone": Attribute(value: "facephone"),
-      }),
-  Account(
-      color: Colors.orange,
-      name: "Google 1",
-      mainKey: "gmail",
-      secKey: "pass",
-      attributes: {
-        "gmail": Attribute(value: "g@mail.com"),
-        "pass": Attribute(value: "gpass", isSensitive: true)
-      })
+  if (acc != null) acc!,
 ];
+
+String accJson = Account(
+    color: Colors.blue,
+    mainKey: "email",
+    secKey: "password",
+    name: "Facebook",
+    attributes: {
+      "email": Attribute(
+        value: "face@book.com",
+      ),
+      "password": Attribute(value: "facepass", isSensitive: true),
+      "phone": Attribute(value: "facephone"),
+    }).toJSON("");
+
+Account? acc = Account.fromJSON(accJson, "");
