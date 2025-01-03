@@ -118,6 +118,9 @@ class Account {
 
   void setSec(String secKey) {
     if (_mainKey == secKey) {
+      if (_secKey == "") {
+        return;
+      }
       _mainKey = _secKey;
     }
     if (_secKey == secKey) {
