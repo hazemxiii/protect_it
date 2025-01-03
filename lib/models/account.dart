@@ -19,7 +19,7 @@ class Account {
     _name = name;
     List<String> keys = _attributes.keys.toList();
     if (!keys.contains(_mainKey)) {
-      throw "Main Key Doesn't Exist";
+      throw "Main Key Doesn't Exist for account $name";
     }
     if (!keys.contains(_secKey) && _secKey != "") {
       throw "Secondary Key Doesn't Exist";

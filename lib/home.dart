@@ -31,9 +31,7 @@ class Home extends StatelessWidget {
             return Column(
               children: [
                 ...accountNot.accounts.map((account) {
-                  return AccountWidget(
-                    account: account,
-                  );
+                  return AccountWidget(account: account);
                 })
               ],
             );

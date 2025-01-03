@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/models/account.dart';
+import 'package:protect_it/service/file.dart';
 
 class AccountNotifier extends ChangeNotifier {
-  AccountNotifier(this.accounts);
+  final String secret;
+  AccountNotifier(this.secret) {
+    FileHolder().init().then((_) {
+      FileHolder().getData(secret).then((data) {
+        accounts = data;
+        notifyListeners();
+      });
+    });
+  }
 
   List<Account> accounts = [];
   Map<String, dynamic> deleteAttributeData = {};

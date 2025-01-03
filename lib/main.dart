@@ -14,7 +14,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => AccountNotifier(accounts),
+      create: (context) => AccountNotifier(""),
       child: const MaterialApp(
         home: Home(),
       ),
