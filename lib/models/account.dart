@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:protect_it/service/encryption.dart';
+import 'package:protect_it/service/file.dart';
 
 class Account {
   Account({
@@ -32,33 +33,35 @@ class Account {
   late Color _color;
   late Map<String, Attribute> _attributes = {};
 
-  String toJSON(String secret) {
+  String toJSON() {
+    Encryption en = Encryption();
     Map<String, String> map = {};
-    map['name'] = encryptData(_name, secret);
+    map['name'] = en.encryptData(_name);
     map['color'] = _color.value.toString();
-    map['mainKey'] = encryptData(_mainKey, secret);
-    map['secKey'] = encryptData(_secKey, secret);
+    map['mainKey'] = en.encryptData(_mainKey);
+    map['secKey'] = en.encryptData(_secKey);
     for (String attr in attributes.keys) {
-      map[encryptData(attr, secret)] = _attributes[attr]!.toJSON(secret);
+      map[en.encryptData(attr)] = _attributes[attr]!.toJSON();
     }
     return jsonEncode(map);
   }
 
-  static Account? fromJSON(String json, String secret) {
+  static Account? fromJSON(String json) {
     try {
+      Encryption en = Encryption();
       Map map = jsonDecode(json);
       Map<String, Attribute> attributes = {};
-      String name = decryptData(map['name']!, secret);
+      String name = en.decryptData(map['name']!);
       Color color = Color(int.parse(map['color']!));
-      String mainKey = decryptData(map['mainKey']!, secret);
-      String secKey = decryptData(map['secKey']!, secret);
+      String mainKey = en.decryptData(map['mainKey']!);
+      String secKey = en.decryptData(map['secKey']!);
       for (String key in map.keys) {
         if (key.contains(":")) {
-          Attribute? attr = Attribute.fromJSON(map[key]!, secret);
+          Attribute? attr = Attribute.fromJSON(map[key]!);
           if (attr == null) {
             return null;
           }
-          attributes[decryptData(key, secret)] = attr;
+          attributes[en.decryptData(key)] = attr;
         }
       }
 
@@ -69,6 +72,9 @@ class Account {
           secKey: secKey,
           color: color);
     } catch (e) {
+      if (e == DecryptFileErrors.wrongKey) {
+        rethrow;
+      }
       return null;
     }
   }
@@ -146,18 +152,18 @@ class Attribute {
   String value;
   bool isSensitive;
 
-  String toJSON(String secret) {
+  String toJSON() {
     Map<String, String> map = {};
     map['sensitive'] = isSensitive.toString();
-    map['value'] = encryptData(value, secret);
+    map['value'] = Encryption().encryptData(value);
     return jsonEncode(map);
   }
 
-  static Attribute? fromJSON(String json, String secret) {
+  static Attribute? fromJSON(String json) {
     try {
       Map map = jsonDecode(json);
       return Attribute(
-          value: decryptData(map['value']!, secret),
+          value: Encryption().decryptData(map['value']!),
           isSensitive: (map['sensitive']!) == "true");
     } catch (e) {
       return null;

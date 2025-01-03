@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:protect_it/models/account.dart';
 
+enum DecryptFileErrors { notAccount, wrongKey }
+
 class FileHolder {
   static File? file;
 
@@ -23,15 +25,37 @@ class FileHolder {
     }
   }
 
-  Future<List<Account>> getData(String secret) async {
+  Future<List<Account>> getData() async {
     List<String> data = (await file!.readAsString()).split("\n");
     List<Account> accounts = [];
     for (String json in data) {
-      Account? account = Account.fromJSON(json, secret);
-      if (account != null) {
-        accounts.add(account);
+      try {
+        Account? account = Account.fromJSON(json);
+        if (account != null) {
+          accounts.add(account);
+        }
+      } catch (e) {
+        if (e == DecryptFileErrors.wrongKey) {
+          rethrow;
+        }
       }
     }
     return accounts;
+  }
+
+  Future<bool> updateFile(List<Account> newData) async {
+    if (file == null) {
+      return false;
+    }
+    List<String> data = [];
+    for (Account acc in newData) {
+      data.add(acc.toJSON());
+    }
+    try {
+      await file!.writeAsString(data.join("\n"));
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/home.dart';
-import 'package:protect_it/models/account.dart';
-import 'package:protect_it/service/account_notifier.dart';
-import 'package:provider/provider.dart';
+import 'package:protect_it/secret_code.dart';
 
 void main() {
   runApp(const App());
@@ -13,30 +10,15 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AccountNotifier(""),
-      child: const MaterialApp(
-        home: Home(),
-      ),
+    return const MaterialApp(
+      home: SecretCodePage(),
     );
+    // return ChangeNotifierProvider(
+    //   create: (context) => AccountNotifier([]),
+    //   child: MaterialApp(
+    //     home:
+    //         Encryption().secret != null ? const Home() : const SecretCodePage(),
+    //   ),
+    // );
   }
 }
-
-List<Account> accounts = [
-  if (acc != null) acc!,
-];
-
-String accJson = Account(
-    color: Colors.blue,
-    mainKey: "email",
-    secKey: "password",
-    name: "Facebook",
-    attributes: {
-      "email": Attribute(
-        value: "face@book.com",
-      ),
-      "password": Attribute(value: "facepass", isSensitive: true),
-      "phone": Attribute(value: "facephone"),
-    }).toJSON("");
-
-Account? acc = Account.fromJSON(accJson, "");

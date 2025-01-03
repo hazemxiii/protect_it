@@ -3,42 +3,53 @@ import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/file.dart';
 
 class AccountNotifier extends ChangeNotifier {
-  final String secret;
-  AccountNotifier(this.secret) {
-    FileHolder().init().then((_) {
-      FileHolder().getData(secret).then((data) {
-        accounts = data;
-        notifyListeners();
-      });
-    });
+  List<Account> accounts;
+  AccountNotifier(this.accounts) {
+    // getData();
   }
 
-  List<Account> accounts = [];
+  // List<Account> accounts = [];
+  bool? wrongKey;
   Map<String, dynamic> deleteAttributeData = {};
+  final FileHolder f = FileHolder();
+
+  Future<void> getData() async {
+    await FileHolder().init();
+    try {
+      List<Account> data = await FileHolder().getData();
+      accounts = data;
+      notifyListeners();
+    } catch (e) {
+      if (e == DecryptFileErrors.wrongKey) {
+        wrongKey = true;
+        notifyListeners();
+      }
+    }
+  }
 
   void addAccount(Account account) {
     accounts.add(account);
-    notifyListeners();
+    writeUpdate();
   }
 
   void setSensitive(Attribute attribute, bool v) {
     attribute.updateSensitivity(v);
-    notifyListeners();
+    writeUpdate();
   }
 
   void setMain(Account account, String key) {
     account.setMain(key);
-    notifyListeners();
+    writeUpdate();
   }
 
   void setSec(Account account, String key) {
     account.setSec(key);
-    notifyListeners();
+    writeUpdate();
   }
 
   void updateValue(String value, Attribute attr) {
     attr.updateValue(value);
-    notifyListeners();
+    writeUpdate();
   }
 
   void updateAttrKey(Account account, String oldKey, String newKey) {
@@ -53,17 +64,17 @@ class AccountNotifier extends ChangeNotifier {
       account.setSec(newKey);
     }
     account.attributes.remove(oldKey);
-    notifyListeners();
+    writeUpdate();
   }
 
   void updateColor(Account account, Color c) {
     account.updateColor(c);
-    notifyListeners();
+    writeUpdate();
   }
 
   void deleteAccount(Account account) {
     accounts.remove(account);
-    notifyListeners();
+    writeUpdate();
   }
 
   Map<String, Attribute> addAttribute(Account account) {
@@ -75,7 +86,7 @@ class AccountNotifier extends ChangeNotifier {
       name = "newAttribute_${number + 1}";
     }
     account.addAttributes({"newAttribute": attr});
-    notifyListeners();
+    writeUpdate();
     return {name: attr};
   }
 
@@ -87,7 +98,7 @@ class AccountNotifier extends ChangeNotifier {
     deleteAttributeData['account'] = account;
     deleteAttributeData['attribute'] = attr;
     deleteAttributeData['key'] = attributeKey;
-    notifyListeners();
+    writeUpdate();
     return true;
   }
 
@@ -100,11 +111,19 @@ class AccountNotifier extends ChangeNotifier {
           .addAttributes({key: attribute});
     }
     deleteAttributeData = {};
-    notifyListeners();
+    writeUpdate();
   }
 
   void updateName(Account account, String newName) {
     account.updateName(newName);
-    notifyListeners();
+    writeUpdate();
+  }
+
+  void writeUpdate() async {
+    if (await FileHolder().updateFile(accounts)) {
+      notifyListeners();
+    } else {
+      getData();
+    }
   }
 }
