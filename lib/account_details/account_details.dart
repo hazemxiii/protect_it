@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/account_details/attribute_custom_widgets.dart';
 import 'package:protect_it/account_details/attribute_details.dart';
+import 'package:protect_it/home.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:provider/provider.dart';
@@ -63,7 +64,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                mainAxisExtent: 200,
+                mainAxisExtent: 250,
                 maxCrossAxisExtent: 250),
             children: [
               ...widget.account.attributes.entries.map((e) {
@@ -121,7 +122,12 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                     onPressed: () {
                       accountNotifer.deleteAccount(widget.account);
                       Navigator.of(context).pop();
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => Consumer(
+                                  builder: (context, accountNot, _) =>
+                                      const Home())),
+                          (_) => false);
                     },
                     child: Text("Delete", style: style))
               ],

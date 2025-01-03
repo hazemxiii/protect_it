@@ -3,27 +3,23 @@ import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/file.dart';
 
 class AccountNotifier extends ChangeNotifier {
-  List<Account> accounts;
-  AccountNotifier(this.accounts) {
+  AccountNotifier() {
     // getData();
   }
 
-  // List<Account> accounts = [];
-  bool? wrongKey;
+  List<Account> accounts = [];
   Map<String, dynamic> deleteAttributeData = {};
   final FileHolder f = FileHolder();
 
-  Future<void> getData() async {
+  Future<bool> getData() async {
     await FileHolder().init();
     try {
       List<Account> data = await FileHolder().getData();
       accounts = data;
       notifyListeners();
+      return true;
     } catch (e) {
-      if (e == DecryptFileErrors.wrongKey) {
-        wrongKey = true;
-        notifyListeners();
-      }
+      return false;
     }
   }
 

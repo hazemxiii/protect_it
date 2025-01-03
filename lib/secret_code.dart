@@ -84,15 +84,15 @@ class _SecretCodePageState extends State<SecretCodePage> {
   void login(BuildContext context, String secret) async {
     Encryption().setSecret(secret);
 
-    List<Account>? data = await getData();
-    if (data != null && context.mounted) {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider(
-                create: (context) => AccountNotifier(data),
-                child: const MaterialApp(
-                  home: Home(),
-                ),
-              )));
+    // List<Account>? data = await getData();
+    bool isCorrect =
+        await Provider.of<AccountNotifier>(context, listen: false).getData();
+
+    if (isCorrect) {
+      if (context.mounted) {
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (_) => const Home()));
+      }
     } else {
       setState(() {
         error = true;

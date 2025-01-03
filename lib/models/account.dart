@@ -39,7 +39,9 @@ class Account {
     map['name'] = en.encryptData(_name);
     map['color'] = _color.value.toString();
     map['mainKey'] = en.encryptData(_mainKey);
-    map['secKey'] = en.encryptData(_secKey);
+    if (_secKey != "") {
+      map['secKey'] = en.encryptData(_secKey);
+    }
     for (String attr in attributes.keys) {
       map[en.encryptData(attr)] = _attributes[attr]!.toJSON();
     }
@@ -54,7 +56,10 @@ class Account {
       String name = en.decryptData(map['name']!);
       Color color = Color(int.parse(map['color']!));
       String mainKey = en.decryptData(map['mainKey']!);
-      String secKey = en.decryptData(map['secKey']!);
+
+      String secKey =
+          map['secKey'] != null ? en.decryptData(map['secKey']) : "";
+
       for (String key in map.keys) {
         if (key.contains(":")) {
           Attribute? attr = Attribute.fromJSON(map[key]!);
