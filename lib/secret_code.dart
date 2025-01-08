@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/home.dart';
-import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/encryption.dart';
-import 'package:protect_it/service/file.dart';
 import 'package:provider/provider.dart';
 
 class SecretCodePage extends StatefulWidget {
@@ -14,13 +12,21 @@ class SecretCodePage extends StatefulWidget {
 }
 
 class _SecretCodePageState extends State<SecretCodePage> {
+  bool isVisible = false;
   bool error = false;
+
+  late TextEditingController secretController;
+
+  @override
+  void initState() {
+    secretController = TextEditingController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     UnderlineInputBorder border =
         const UnderlineInputBorder(borderSide: BorderSide());
-    final secretController = TextEditingController();
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -31,10 +37,16 @@ class _SecretCodePageState extends State<SecretCodePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
+                obscureText: !isVisible,
                 controller: secretController,
                 style: const TextStyle(color: Colors.black),
                 cursorColor: Colors.black,
                 decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                        onPressed: _toggleVisibility,
+                        icon: Icon(isVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off)),
                     label: const Text(
                       "Secret Key",
                       style:
@@ -53,7 +65,7 @@ class _SecretCodePageState extends State<SecretCodePage> {
                 height: 10,
               ),
               InkWell(
-                onTap: () => login(context, secretController.text),
+                onTap: () => _login(context, secretController.text),
                 child: Container(
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -81,10 +93,15 @@ class _SecretCodePageState extends State<SecretCodePage> {
     );
   }
 
-  void login(BuildContext context, String secret) async {
+  void _toggleVisibility() {
+    setState(() {
+      isVisible = !isVisible;
+    });
+  }
+
+  void _login(BuildContext context, String secret) async {
     Encryption().setSecret(secret);
 
-    // List<Account>? data = await getData();
     bool isCorrect =
         await Provider.of<AccountNotifier>(context, listen: false).getData();
 
@@ -97,15 +114,6 @@ class _SecretCodePageState extends State<SecretCodePage> {
       setState(() {
         error = true;
       });
-    }
-  }
-
-  Future<List<Account>?> getData() async {
-    await FileHolder().init();
-    try {
-      return await FileHolder().getData();
-    } catch (e) {
-      return null;
     }
   }
 }

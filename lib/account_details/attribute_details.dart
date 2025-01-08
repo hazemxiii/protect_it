@@ -3,6 +3,7 @@ import 'package:protect_it/account_details/account_details.dart';
 import 'package:protect_it/account_details/attribute_custom_widgets.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
+import 'package:protect_it/service/global.dart';
 import 'package:provider/provider.dart';
 
 class AttributeWidget extends StatefulWidget {
@@ -57,6 +58,11 @@ class _AttributeWidgetState extends State<AttributeWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              IconButton(
+                  color: widget.account.color,
+                  onPressed: () =>
+                      copy(context, widget.account.color, widget.attr.value),
+                  icon: const Icon(Icons.copy)),
               IconButton(
                   color: widget.account.color,
                   onPressed: _deleteAttribute,

@@ -23,6 +23,13 @@ class AccountNotifier extends ChangeNotifier {
     }
   }
 
+  Future<void> cancel(Account account, Account old) async {
+    int i = accounts.indexOf(account);
+    accounts.removeAt(i);
+    accounts.insert(i, old);
+    await writeUpdate();
+  }
+
   void addAccount(Account account) {
     accounts.add(account);
     writeUpdate();
@@ -81,7 +88,7 @@ class AccountNotifier extends ChangeNotifier {
       int number = int.tryParse(name[name.length - 1]) ?? 0;
       name = "newAttribute_${number + 1}";
     }
-    account.addAttributes({"newAttribute": attr});
+    account.addAttributes({name: attr});
     writeUpdate();
     return {name: attr};
   }
@@ -115,7 +122,7 @@ class AccountNotifier extends ChangeNotifier {
     writeUpdate();
   }
 
-  void writeUpdate() async {
+  Future<void> writeUpdate() async {
     if (await FileHolder().updateFile(accounts)) {
       notifyListeners();
     } else {

@@ -19,11 +19,13 @@ class AccountDetailsPage extends StatefulWidget {
 class _AccountDetailsPageState extends State<AccountDetailsPage> {
   late AccountNotifier accountNotifer;
   late final TextEditingController accountNameCont;
+  late final String accountBackUp;
 
   @override
   void initState() {
     accountNotifer = Provider.of(context, listen: false);
     accountNameCont = TextEditingController(text: widget.account.name);
+    accountBackUp = widget.account.toJSON();
     super.initState();
   }
 
@@ -57,29 +59,53 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          height: MediaQuery.of(context).size.height - 200,
-          child: GridView(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                mainAxisExtent: 250,
-                maxCrossAxisExtent: 250),
-            children: [
-              ...widget.account.attributes.entries.map((e) {
-                return AttributeWidget(
-                  account: widget.account,
-                  type: _getType(e.key),
-                  attr: e.value,
-                  attributeKey: e.key,
-                );
-              })
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 5,
+            ),
+            IconButton(
+              color: widget.account.color,
+              onPressed: _cancel,
+              icon: Text(
+                "Cancel",
+                style: TextStyle(color: widget.account.color),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              height: MediaQuery.of(context).size.height - 105,
+              child: GridView(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    mainAxisExtent: 250,
+                    maxCrossAxisExtent: 320),
+                children: [
+                  ...widget.account.attributes.entries.map((e) {
+                    return AttributeWidget(
+                      account: widget.account,
+                      type: _getType(e.key),
+                      attr: e.value,
+                      attributeKey: e.key,
+                    );
+                  })
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  void _cancel() async {
+    await accountNotifer.cancel(
+        widget.account, Account.fromJSON(accountBackUp)!);
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   void _showEditDialog() {

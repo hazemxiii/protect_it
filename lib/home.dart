@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:protect_it/account_details/account_details.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
+import 'package:protect_it/service/global.dart';
 import 'package:provider/provider.dart';
-import 'package:clipboard/clipboard.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -156,34 +156,25 @@ class _AccountWidgetState extends State<AccountWidget> {
     if (widget.account.secKey == "") {
       return IconButton(
           color: widget.account.color,
-          onPressed: () => _copy(widget.account.mainAttr),
+          onPressed: () => copy(
+              context, widget.account.color, widget.account.mainAttr.value),
           icon: const Icon(Icons.copy));
     }
     return PopupMenuButton(
-        onSelected: (v) => _copy(v),
+        iconColor: widget.account.color,
+        color: widget.account.color,
+        onSelected: (v) => copy(context, widget.account.color, v.value),
         itemBuilder: (_) => [
               PopupMenuItem(
                   value: widget.account.mainAttr,
-                  child: Text("Copy ${widget.account.mainKey}")),
+                  child: Text(
+                    "Copy ${widget.account.mainKey}",
+                    style: const TextStyle(color: Colors.white),
+                  )),
               PopupMenuItem(
                   value: widget.account.secAttr,
-                  child: Text("Copy ${widget.account.secKey}"))
+                  child: Text("Copy ${widget.account.secKey}",
+                      style: const TextStyle(color: Colors.white)))
             ]);
-  }
-
-  void _copy(Attribute attr) async {
-    await FlutterClipboard.copy(attr.value);
-    _showCopiedSnackBack(attr.value);
-  }
-
-  void _showCopiedSnackBack(String s) async {
-    String copied = await FlutterClipboard.paste();
-    if (s != copied) {
-      return;
-    }
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          duration: Duration(seconds: 2), content: Text("Copied")));
-    }
   }
 }
