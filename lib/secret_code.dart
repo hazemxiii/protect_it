@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/home.dart';
+import 'package:protect_it/accounts_page/accounts_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/encryption.dart';
 import 'package:provider/provider.dart';
@@ -107,8 +107,8 @@ class _SecretCodePageState extends State<SecretCodePage> {
 
     if (isCorrect) {
       if (context.mounted) {
-        Navigator.of(context)
-            .pushReplacement(MaterialPageRoute(builder: (_) => const Home()));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const AccountsPage()));
       }
     } else {
       setState(() {

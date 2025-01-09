@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/account_details/account_details.dart';
+import 'package:protect_it/accounts_page/change_dialog_widget.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/global.dart';
 import 'package:provider/provider.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class AccountsPage extends StatelessWidget {
+  const AccountsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +20,12 @@ class Home extends StatelessWidget {
       ),
       backgroundColor: Colors.white,
       appBar: AppBar(
+        actions: [
+          IconButton(
+              color: Colors.black,
+              onPressed: () => _showChangeSecretDialog(context),
+              icon: const Icon(Icons.swap_horiz))
+        ],
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         title: Consumer<AccountNotifier>(builder: (context, accountNot, _) {
@@ -40,6 +47,10 @@ class Home extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showChangeSecretDialog(context) {
+    showDialog(context: context, builder: (_) => const ChangeSecretDialog());
   }
 
   void _addAccount(BuildContext context) {

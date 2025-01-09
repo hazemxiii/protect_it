@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/home.dart';
+import 'package:protect_it/accounts_page/accounts_page.dart';
 import 'package:protect_it/secret_code.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/encryption.dart';
@@ -20,8 +20,9 @@ class App extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AccountNotifier(),
       child: MaterialApp(
-        home:
-            Encryption().secret != null ? const Home() : const SecretCodePage(),
+        home: Encryption().secret != null
+            ? const AccountsPage()
+            : const SecretCodePage(),
       ),
     );
   }
