@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/file.dart';
+import 'package:protect_it/service/storage.dart';
 
 class AccountNotifier extends ChangeNotifier {
   AccountNotifier() {
@@ -128,5 +131,13 @@ class AccountNotifier extends ChangeNotifier {
     } else {
       getData();
     }
+  }
+
+  Future<void> pickFile() async {
+    File? importedFile = await Storage().pickFile();
+    if (importedFile != null) {
+      await f.replaceFile(importedFile);
+    }
+    getData();
   }
 }

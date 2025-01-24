@@ -43,6 +43,10 @@ class FileHolder {
     return accounts;
   }
 
+  Future<void> replaceFile(File newFile) async {
+    await file!.writeAsString(await newFile.readAsString());
+  }
+
   Future<bool> updateFile(List<Account> newData) async {
     if (file == null) {
       return false;
