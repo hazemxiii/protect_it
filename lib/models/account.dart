@@ -18,6 +18,11 @@ class Account {
     _mainKey = mainKey;
     _attributes = attributes;
     _name = name;
+    String key = _name;
+    while (names.containsKey(key)) {
+      key = "$key ";
+    }
+    names[key] = this;
     List<String> keys = _attributes.keys.toList();
     if (!keys.contains(_mainKey)) {
       throw "Main Key Doesn't Exist for account $name";
@@ -27,6 +32,7 @@ class Account {
     }
   }
 
+  static Map<String, Account> names = {};
   late String _name;
   late String _mainKey;
   late String _secKey;
@@ -139,7 +145,9 @@ class Account {
   }
 
   void updateName(String newName) {
+    names.remove(_name);
     _name = newName;
+    names[newName] = this;
   }
 
   Attribute get mainAttr => _attributes[_mainKey]!;

@@ -102,10 +102,10 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _saveFile() async {
-    bool isSaved = await Storage().saveFile();
-    if (isSaved && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("File Saved In Your Downloads")));
+    String? path = await Storage().saveFile();
+    if (path != null && mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("File Saved At $path")));
     }
   }
 

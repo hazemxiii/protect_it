@@ -129,6 +129,7 @@ class _AttributeWidgetState extends State<AttributeWidget> {
     } else {
       txt = "".padLeft(widget.attr.value.length, "*");
     }
+    // TODO: fix text overflow
     return Text(
       txt,
       style: TextStyle(color: widget.account.color),

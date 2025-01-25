@@ -30,20 +30,21 @@ class Storage {
     return null;
   }
 
-  Future<bool> saveFile() async {
+  Future<String?> saveFile() async {
     if (!await requestStoragePermission()) {
-      return false;
+      return null;
     }
     Directory? outputFile = await getDownloadsDirectory();
     try {
       if (outputFile != null) {
-        File f = File("${outputFile.path}/account.act");
+        String path = "${outputFile.path}\\account.act";
+        File f = File(path);
         await f.writeAsString(await FileHolder.file!.readAsString());
+        return path;
       }
-      return true;
     } catch (e) {
       debugPrint(e.toString());
     }
-    return false;
+    return null;
   }
 }

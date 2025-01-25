@@ -1,16 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fuzzywuzzy/fuzzywuzzy.dart';
+import 'package:fuzzywuzzy/model/extracted_result.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/file.dart';
 import 'package:protect_it/service/storage.dart';
 
 class AccountNotifier extends ChangeNotifier {
-  AccountNotifier() {
-    // getData();
-  }
-
-  List<Account> accounts = [];
+  String searchQ = "";
+  List<Account> _accounts = [];
   Map<String, dynamic> deleteAttributeData = {};
   final FileHolder f = FileHolder();
 
@@ -18,7 +17,7 @@ class AccountNotifier extends ChangeNotifier {
     await FileHolder().init();
     try {
       List<Account> data = await FileHolder().getData();
-      accounts = data;
+      _accounts = data;
       notifyListeners();
       return true;
     } catch (e) {
@@ -27,14 +26,14 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   Future<void> cancel(Account account, Account old) async {
-    int i = accounts.indexOf(account);
-    accounts.removeAt(i);
-    accounts.insert(i, old);
+    int i = _accounts.indexOf(account);
+    _accounts.removeAt(i);
+    _accounts.insert(i, old);
     await writeUpdate();
   }
 
   void addAccount(Account account) {
-    accounts.add(account);
+    _accounts.add(account);
     writeUpdate();
   }
 
@@ -79,7 +78,7 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   void deleteAccount(Account account) {
-    accounts.remove(account);
+    _accounts.remove(account);
     writeUpdate();
   }
 
@@ -126,7 +125,7 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   Future<void> writeUpdate() async {
-    if (await FileHolder().updateFile(accounts)) {
+    if (await FileHolder().updateFile(_accounts)) {
       notifyListeners();
     } else {
       getData();
@@ -139,5 +138,32 @@ class AccountNotifier extends ChangeNotifier {
       await f.replaceFile(importedFile);
     }
     getData();
+  }
+
+  void updateSearchQ(String s) {
+    searchQ = s;
+    notifyListeners();
+  }
+
+  List<Account> accounts() {
+    if (searchQ.trim() == "") {
+      return _accounts;
+    } else {
+      List<Account> filtered = [];
+      List<ExtractedResult<String>> result = extractTop(
+        query: searchQ,
+        choices: Account.names.keys.toList(),
+        limit: 10,
+        cutoff: 50,
+      );
+
+      for (var r in result) {
+        Account account = Account.names[r.choice]!;
+        if (_accounts.contains(account)) {
+          filtered.add(account);
+        }
+      }
+      return filtered;
+    }
   }
 }

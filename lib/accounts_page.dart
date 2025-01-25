@@ -29,9 +29,7 @@ class AccountsPage extends StatelessWidget {
         ],
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        title: Consumer<AccountNotifier>(builder: (context, accountNot, _) {
-          return Text("Accounts: ${accountNot.accounts.length}");
-        }),
+        title: _searchWidget(),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -39,7 +37,7 @@ class AccountsPage extends StatelessWidget {
           child: Consumer<AccountNotifier>(builder: (context, accountNot, _) {
             return Column(
               children: [
-                ...accountNot.accounts.map((account) {
+                ...accountNot.accounts().map((account) {
                   return AccountWidget(account: account);
                 })
               ],
@@ -48,6 +46,32 @@ class AccountsPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _searchWidget() {
+    TextEditingController controller = TextEditingController();
+    const BorderSide side = BorderSide(color: Colors.black);
+    return Consumer<AccountNotifier>(builder: (context, accountNot, _) {
+      controller.text = accountNot.searchQ;
+      return TextField(
+        cursorColor: Colors.black,
+        style: const TextStyle(color: Colors.black),
+        decoration: InputDecoration(
+            hintText: "Search",
+            hintStyle: const TextStyle(color: Colors.grey),
+            suffixIcon: const Icon(
+              Icons.search,
+              color: Colors.black,
+            ),
+            enabledBorder: const UnderlineInputBorder(borderSide: side),
+            focusedBorder:
+                UnderlineInputBorder(borderSide: side.copyWith(width: 3))),
+        controller: controller,
+        onChanged: (v) {
+          accountNot.updateSearchQ(v);
+        },
+      );
+    });
   }
 
   void _addAccount(BuildContext context) {
