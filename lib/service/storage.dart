@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:protect_it/service/file.dart';
@@ -28,15 +30,20 @@ class Storage {
     return null;
   }
 
-  void saveFile() async {
-    String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: 'Please select an output file:',
-      fileName: 'accounts.act',
-    );
-
-    if (outputFile != null) {
-      File f = File(outputFile);
-      await f.writeAsString(await FileHolder.file!.readAsString());
+  Future<bool> saveFile() async {
+    if (!await requestStoragePermission()) {
+      return false;
     }
+    Directory? outputFile = await getDownloadsDirectory();
+    try {
+      if (outputFile != null) {
+        File f = File("${outputFile.path}/account.act");
+        await f.writeAsString(await FileHolder.file!.readAsString());
+      }
+      return true;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return false;
   }
 }

@@ -3,7 +3,7 @@ import 'package:protect_it/account_details/account_details.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/global.dart';
-import 'package:protect_it/settings.dart';
+import 'package:protect_it/settings_page/settings.dart';
 import 'package:provider/provider.dart';
 
 class AccountsPage extends StatelessWidget {

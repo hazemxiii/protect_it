@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/accounts_page/accounts_page.dart';
+import 'package:protect_it/accounts_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/encryption.dart';
 import 'package:provider/provider.dart';

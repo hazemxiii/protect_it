@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/accounts_page/change_dialog_widget.dart';
+import 'package:protect_it/settings_page/change_dialog_widget.dart';
 import 'package:protect_it/secret_code.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/storage.dart';
@@ -75,19 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
         shape: const RoundedRectangleBorder(
             side: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.all(Radius.circular(5))),
-        onPressed: isImport
-            ? () async {
-                if (mounted) {
-                  await Provider.of<AccountNotifier>(context, listen: false)
-                      .pickFile();
-                }
-                if (mounted) {
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const SecretCodePage()),
-                      (_) => false);
-                }
-              }
-            : Storage().saveFile,
+        onPressed: isImport ? _pickFile : _saveFile,
         child: Row(
           children: [
             Icon(
@@ -100,6 +88,25 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ));
+  }
+
+  void _pickFile() async {
+    if (mounted) {
+      await Provider.of<AccountNotifier>(context, listen: false).pickFile();
+    }
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const SecretCodePage()),
+          (_) => false);
+    }
+  }
+
+  void _saveFile() async {
+    bool isSaved = await Storage().saveFile();
+    if (isSaved && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("File Saved In Your Downloads")));
+    }
   }
 
   void _showChangeSecretDialog(context) {
