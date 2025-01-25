@@ -73,12 +73,16 @@ class _AttributeWidgetState extends State<AttributeWidget> {
                   icon: const Icon(Icons.edit))
             ],
           ),
-          Text(
-            widget.attributeKey,
-            style: TextStyle(
-                color: widget.account.color,
-                fontWeight: FontWeight.bold,
-                fontSize: 20),
+          Flexible(
+            child: Text(
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              widget.attributeKey,
+              style: TextStyle(
+                  color: widget.account.color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20),
+            ),
           ),
           Row(
             children: [
@@ -122,17 +126,20 @@ class _AttributeWidgetState extends State<AttributeWidget> {
     }
   }
 
-  Text _displayAttribute(bool isSensitive) {
+  Widget _displayAttribute(bool isSensitive) {
     String txt;
     if (isSensitiveShown || !widget.attr.isSensitive) {
       txt = widget.attr.value;
     } else {
       txt = "".padLeft(widget.attr.value.length, "*");
     }
-    // TODO: fix text overflow
-    return Text(
-      txt,
-      style: TextStyle(color: widget.account.color),
+
+    return Expanded(
+      child: Text(
+        overflow: TextOverflow.ellipsis,
+        txt,
+        style: TextStyle(color: widget.account.color),
+      ),
     );
   }
 
