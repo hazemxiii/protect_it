@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
+import 'package:protect_it/service/prefs.dart';
 import 'package:provider/provider.dart';
 
 class UndoWidget extends StatefulWidget {
@@ -113,13 +114,28 @@ class _EditAttributeWidgetState extends State<EditAttributeWidget> {
       surfaceTintColor: widget.account.color,
       content: Form(
         key: formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _input(nameController, _attrNameValidator),
-            _input(valueController, _attrValueValidator),
-          ],
-        ),
+        child: Consumer<AccountNotifier>(builder: (context, not, _) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                  activeColor: widget.account.color,
+                  inactiveTrackColor: Colors.white,
+                  inactiveThumbColor: widget.account.color,
+                  title: Text(
+                    "Sensitive",
+                    style: TextStyle(color: widget.account.color),
+                  ),
+                  value: widget.attr.isSensitive,
+                  onChanged: (v) {
+                    not.setSensitive(widget.attr, v);
+                  }),
+              _input(nameController, _attrNameValidator, false, false),
+              _input(valueController, _attrValueValidator,
+                  widget.attr.isSensitive, true),
+            ],
+          );
+        }),
       ),
       actions: [
         TextButton(
@@ -156,19 +172,33 @@ class _EditAttributeWidgetState extends State<EditAttributeWidget> {
     }
   }
 
-  TextFormField _input(
-      TextEditingController controller, FormFieldValidator<String?> validator) {
+  TextFormField _input(TextEditingController controller,
+      FormFieldValidator<String?> validator, bool hide, bool showRandomiser) {
     final border = UnderlineInputBorder(
         borderSide: BorderSide(color: widget.account.color, width: 1));
     final focusBorder = UnderlineInputBorder(
         borderSide: BorderSide(color: widget.account.color, width: 3));
     return TextFormField(
+      obscureText: hide,
       style: TextStyle(color: widget.account.color),
       cursorColor: widget.account.color,
       controller: controller,
-      decoration:
-          InputDecoration(focusedBorder: focusBorder, enabledBorder: border),
+      decoration: InputDecoration(
+          focusedBorder: focusBorder,
+          enabledBorder: border,
+          suffixIcon: showRandomiser
+              ? IconButton(
+                  onPressed: () => _pickRandom(controller),
+                  icon: Icon(
+                    Icons.restart_alt_rounded,
+                    color: widget.account.color,
+                  ))
+              : null),
       validator: validator,
     );
+  }
+
+  void _pickRandom(TextEditingController controller) {
+    controller.text = Prefs.getRandomPass().create();
   }
 }
