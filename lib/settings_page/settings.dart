@@ -3,6 +3,7 @@ import 'package:protect_it/settings_page/change_dialog_widget.dart';
 import 'package:protect_it/secret_code.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/storage.dart';
+import 'package:protect_it/settings_page/random_pass_widget.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -25,7 +26,14 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          children: [_accountSection(context), _fileSection(context)],
+          children: [
+            _accountSection(context),
+            _fileSection(context),
+            const SettingsSectionWidget(
+                content: RandomPassWidget(),
+                title: "Password Generator",
+                hint: "")
+          ],
         ),
       ),
     );

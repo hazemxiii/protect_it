@@ -14,7 +14,18 @@ class Prefs {
         nums: prefs.getBool("nums") ?? true,
         length: prefs.getInt("length") ?? 13,
         specialActive: prefs.getBool("specialActive") ?? true,
-        not: prefs.getStringList("not") ?? [],
-        special: prefs.getStringList("special") ?? []);
+        special: prefs.getStringList("special") ??
+            ["\$", "#", "@", "!", "~", "&", "*", "-", "_", "+", "=", "%"]);
+  }
+
+  static Future<bool> saveRandomPassData(RandomPass r) async {
+    bool success = true;
+    success = await prefs.setBool("upper", r.upper);
+    success = await prefs.setBool("lower", r.lower);
+    success = await prefs.setBool("nums", r.nums);
+    success = await prefs.setBool("specialActive", r.specialActive);
+    success = await prefs.setInt("length", r.length);
+    success = await prefs.setStringList("special", r.special);
+    return success;
   }
 }
