@@ -7,6 +7,7 @@ import 'package:protect_it/service/prefs.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Prefs.init();
   runApp(const App());
 }
@@ -16,9 +17,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return const MaterialApp(
-    //   home: SecretCodePage(),
-    // );
     return ChangeNotifierProvider(
       create: (context) => AccountNotifier(),
       child: MaterialApp(

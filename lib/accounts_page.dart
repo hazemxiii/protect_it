@@ -129,13 +129,15 @@ class _AccountWidgetState extends State<AccountWidget> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _displayAttribute(widget.account.mainAttr),
-                      if (widget.account.secAttr != null)
-                        _displayAttribute(widget.account.secAttr!),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _displayAttribute(widget.account.mainAttr),
+                        if (widget.account.secAttr != null)
+                          _displayAttribute(widget.account.secAttr!),
+                      ],
+                    ),
                   ),
                   Row(
                     children: [
@@ -179,6 +181,7 @@ class _AccountWidgetState extends State<AccountWidget> {
       txt = "".padLeft(atr.value.length, "*");
     }
     return Text(
+      overflow: TextOverflow.ellipsis,
       txt,
       style: TextStyle(color: widget.account.color),
     );

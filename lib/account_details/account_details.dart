@@ -65,12 +65,15 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
             const SizedBox(
               height: 5,
             ),
-            IconButton(
-              color: widget.account.color,
-              onPressed: _cancel,
-              icon: Text(
-                "Cancel",
-                style: TextStyle(color: widget.account.color),
+            Container(
+              margin: const EdgeInsets.only(left: 10),
+              child: MaterialButton(
+                color: widget.account.color,
+                onPressed: _cancel,
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
             Container(

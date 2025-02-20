@@ -1,10 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:protect_it/allow_connection_page.dart';
+import 'package:protect_it/send_data_page.dart';
+import 'package:protect_it/server_page.dart';
+import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/settings_page/change_dialog_widget.dart';
 import 'package:protect_it/secret_code.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/storage.dart';
 import 'package:protect_it/settings_page/random_pass_widget.dart';
 import 'package:provider/provider.dart';
+
+class FileButtonData {
+  final String text;
+  final IconData icon;
+  final VoidCallback fn;
+  FileButtonData({required this.text, required this.icon, required this.fn});
+}
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -28,7 +41,22 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           children: [
             _accountSection(context),
-            _fileSection(context),
+            _twoBtnSection(
+                context,
+                "File System",
+                "Import/Export Your Data",
+                FileButtonData(
+                    text: "Import", icon: Icons.download, fn: _pickFile),
+                FileButtonData(
+                    text: "Export", icon: Icons.upload, fn: _saveFile)),
+            _twoBtnSection(
+                context,
+                "Sync",
+                "Auto Sync Your Data",
+                FileButtonData(
+                    text: "Receive", icon: Icons.download, fn: _startServer),
+                FileButtonData(
+                    text: "Send", icon: Icons.upload, fn: _sendData)),
             const SettingsSectionWidget(
                 content: RandomPassWidget(),
                 title: "Password Generator",
@@ -56,24 +84,25 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _fileSection(BuildContext context) {
+  Widget _twoBtnSection(BuildContext context, String title, String hint,
+      FileButtonData leftBtn, FileButtonData rightBtn) {
     return SettingsSectionWidget(
-      title: "File System",
-      hint: "Import/Export Your Data",
+      title: title,
+      hint: hint,
       content: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _fileButton(true),
+          _fileButton(leftBtn),
           const VerticalDivider(
             width: 10,
           ),
-          _fileButton(false),
+          _fileButton(rightBtn),
         ],
       ),
     );
   }
 
-  Widget _fileButton(bool isImport) {
+  Widget _fileButton(FileButtonData btnData) {
     return MaterialButton(
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         color: Colors.black,
@@ -83,15 +112,15 @@ class _SettingsPageState extends State<SettingsPage> {
         shape: const RoundedRectangleBorder(
             side: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.all(Radius.circular(5))),
-        onPressed: isImport ? _pickFile : _saveFile,
+        onPressed: btnData.fn,
         child: Row(
           children: [
             Icon(
-              isImport ? Icons.download : Icons.upload,
+              btnData.icon,
               color: Colors.white,
             ),
             Text(
-              isImport ? "Import" : "Export",
+              btnData.text,
               style: const TextStyle(color: Colors.white),
             ),
           ],
@@ -119,6 +148,22 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _showChangeSecretDialog(context) {
     showDialog(context: context, builder: (_) => const ChangeSecretDialog());
+  }
+
+  void _startServer() {
+    bool dontShow = Prefs.getDontShowAgain();
+    if (Platform.isWindows && !dontShow) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => const CommandPage()));
+    } else {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => const ServerPage()));
+    }
+  }
+
+  void _sendData() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const SendDataPage()));
   }
 }
 

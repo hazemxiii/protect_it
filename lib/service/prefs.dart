@@ -7,6 +7,8 @@ class Prefs {
     prefs = await SharedPreferences.getInstance();
   }
 
+  static const String _dontShowAgain = "dontShowAgain";
+
   static RandomPass getRandomPass() {
     return RandomPass(
         upper: prefs.getBool("upper") ?? true,
@@ -27,5 +29,13 @@ class Prefs {
     success = await prefs.setInt("length", r.length);
     success = await prefs.setStringList("special", r.special);
     return success;
+  }
+
+  static bool getDontShowAgain() {
+    return prefs.getBool(_dontShowAgain) ?? false;
+  }
+
+  static void setDontShowAgain(bool v) {
+    prefs.setBool(_dontShowAgain, v);
   }
 }

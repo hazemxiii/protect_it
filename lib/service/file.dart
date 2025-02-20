@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:protect_it/models/account.dart';
 
@@ -45,6 +46,10 @@ class FileHolder {
 
   Future<void> replaceFile(File newFile) async {
     await file!.writeAsString(await newFile.readAsString());
+  }
+
+  Future<void> writeFromList(Uint8List list) async {
+    await file!.writeAsBytes(list);
   }
 
   Future<bool> updateFile(List<Account> newData) async {
