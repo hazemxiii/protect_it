@@ -1,17 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:protect_it/service/file.dart';
 
 class SyncData {
   static ServerSocket? _server;
-  Future<bool> startServer(BuildContext context, Function(String ip) onConnect,
-      Function onReceive) async {
-    String? ip;
-    try {
-      ip = await _getLocalIpAddress();
-    } catch (e) {
-      print(e);
-    }
+  Future<bool> startServer(
+      Function(String ip) onConnect, Function onReceive) async {
+    String? ip = await _getLocalIpAddress();
     if (ip == null) {
       return false;
     }
@@ -37,13 +33,12 @@ class SyncData {
     }
   }
 
-  void sendData(String ip) async {
-    List<int> fileBytes = await FileHolder.file!.readAsBytes();
-
+  Future<void> sendData(String ip, bool isTest) async {
+    List<int> data = isTest ? [] : await FileHolder.file!.readAsBytes();
     try {
       Socket socket =
           await Socket.connect(ip, 5000, timeout: const Duration(seconds: 5));
-      socket.add(fileBytes);
+      socket.add(data);
       await socket.flush();
       await socket.close();
     } catch (e) {
@@ -55,8 +50,12 @@ class SyncData {
     String baseIp = '192.168.1.';
     for (int i = 1; i < 255; i++) {
       String ip = '$baseIp$i';
-      Socket.connect(ip, 5000, timeout: const Duration(seconds: 1)).then((v) {
+      Socket.connect(ip, 5000, timeout: const Duration(seconds: 1))
+          .then((socket) {
         onFound(ip);
+        socket.flush().then((v) {
+          socket.close();
+        });
       }).catchError((e) {});
     }
   }

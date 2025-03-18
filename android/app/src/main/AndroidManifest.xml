@@ -6,7 +6,7 @@
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
-        android:label="Passwords Safe"
+        android:label="Accounts' Safe"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon" android:requestLegacyExternalStorage="true">
         <!-- Required for accessing external storage -->

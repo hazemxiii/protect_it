@@ -154,6 +154,9 @@ class _SendDataPageState extends State<SendDataPage> {
   }
 
   void _sendData(String ip) async {
-    SyncData().sendData(ip);
+    await SyncData().sendData(ip, false);
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 }

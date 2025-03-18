@@ -15,7 +15,7 @@ class _ServerPageState extends State<ServerPage> {
 
   @override
   void initState() {
-    SyncData().startServer(context, _onConnect, _onReceive);
+    SyncData().startServer(_onConnect, _onReceive);
     super.initState();
   }
 
