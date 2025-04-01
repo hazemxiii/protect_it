@@ -196,7 +196,7 @@ class _AttributeWidgetState extends State<AttributeWidget> {
           Provider.of<AccountNotifier>(
             context,
             listen: false,
-          ).setSensitive(widget.attr, v);
+          ).setSensitive(widget.account, widget.attr, v);
         });
   }
 

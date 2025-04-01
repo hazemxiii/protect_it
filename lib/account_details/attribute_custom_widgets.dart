@@ -128,7 +128,7 @@ class _EditAttributeWidgetState extends State<EditAttributeWidget> {
                   ),
                   value: widget.attr.isSensitive,
                   onChanged: (v) {
-                    not.setSensitive(widget.attr, v);
+                    not.setSensitive(widget.account, widget.attr, v);
                   }),
               _input(nameController, _attrNameValidator, false, false),
               _input(valueController, _attrValueValidator,
@@ -165,7 +165,8 @@ class _EditAttributeWidgetState extends State<EditAttributeWidget> {
 
   void save() {
     if (formKey.currentState!.validate()) {
-      accountNotifier.updateValue(valueController.text, widget.attr);
+      accountNotifier.updateValue(
+          widget.account, valueController.text, widget.attr);
       accountNotifier.updateAttrKey(
           widget.account, widget.attrKey, nameController.text);
       Navigator.of(context).pop();

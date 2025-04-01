@@ -104,8 +104,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   }
 
   void _cancel() async {
-    await accountNotifer.cancel(
-        widget.account, Account.fromJSON(accountBackUp)!);
+    accountNotifer.cancel(widget.account, Account.fromJSON(accountBackUp)!);
     if (mounted) {
       Navigator.of(context).pop();
     }

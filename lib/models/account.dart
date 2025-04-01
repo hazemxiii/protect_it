@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'dart:math';
-
+import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:protect_it/service/encryption.dart';
-import 'package:protect_it/service/file.dart';
 
 class Account {
   Account({
+    String? id,
     required String name,
     required Map<String, Attribute> attributes,
     String mainKey = "",
     String secKey = "",
     Color color = Colors.black,
   }) {
+    _id = id ?? const Uuid().v4();
     _color = color;
     _secKey = secKey;
     _mainKey = mainKey;
@@ -33,6 +34,7 @@ class Account {
   }
 
   static Map<String, Account> names = {};
+  late String _id;
   late String _name;
   late String _mainKey;
   late String _secKey;
@@ -42,8 +44,9 @@ class Account {
   String toJSON() {
     Encryption en = Encryption();
     Map<String, String> map = {};
+    map['id'] = _id;
     map['name'] = en.encryptData(_name);
-    map['color'] = _color.value.toString();
+    map['color'] = _color.toARGB32().toString();
     map['mainKey'] = en.encryptData(_mainKey);
     if (_secKey != "") {
       map['secKey'] = en.encryptData(_secKey);
@@ -62,6 +65,7 @@ class Account {
       String name = en.decryptData(map['name']!);
       Color color = Color(int.parse(map['color']!));
       String mainKey = en.decryptData(map['mainKey']!);
+      String id = map['id']!;
 
       String secKey =
           map['secKey'] != null ? en.decryptData(map['secKey']) : "";
@@ -77,15 +81,16 @@ class Account {
       }
 
       return Account(
+          id: id,
           name: name,
           attributes: attributes,
           mainKey: mainKey,
           secKey: secKey,
           color: color);
     } catch (e) {
-      if (e == DecryptFileErrors.wrongKey) {
-        rethrow;
-      }
+      // if (e == DecryptFileErrors.wrongKey) {
+      //   rethrow;
+      // }
       return null;
     }
   }
@@ -156,6 +161,7 @@ class Account {
   Map<String, Attribute> get attributes => _attributes;
   String get mainKey => _mainKey;
   String get secKey => _secKey;
+  String get id => _id;
   Color get color => _color;
 }
 
