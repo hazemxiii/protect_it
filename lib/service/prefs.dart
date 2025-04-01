@@ -8,6 +8,9 @@ class Prefs {
   }
 
   static const String _dontShowAgain = "dontShowAgain";
+  static const String _accessToken = "accessToken";
+  static const String _username = "username";
+  static const String _password = "password";
 
   static RandomPass getRandomPass() {
     return RandomPass(
@@ -37,5 +40,34 @@ class Prefs {
 
   static void setDontShowAgain(bool v) {
     prefs.setBool(_dontShowAgain, v);
+  }
+
+  static void setAccessToken(String token) {
+    prefs.setString(_accessToken, token);
+  }
+
+  static String getAccessToken() {
+    return prefs.getString(_accessToken) ?? "";
+  }
+
+  static bool get isLoggedIn =>
+      prefs.getString(_username) != null && prefs.getString(_password) != null;
+
+  static void setUsername(String username) {
+    prefs.setString(_username, username);
+  }
+
+  static String? get username => prefs.getString(_username);
+
+  static void setPassword(String password) {
+    prefs.setString(_password, password);
+  }
+
+  static String? get password => prefs.getString(_password);
+
+  static void logout() {
+    prefs.remove(_accessToken);
+    prefs.remove(_username);
+    prefs.remove(_password);
   }
 }

@@ -3,7 +3,7 @@ import 'package:protect_it/account_details/account_details.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/global.dart';
-import 'package:protect_it/settings_page/settings.dart';
+import 'package:protect_it/settings_page/settings_page.dart';
 import 'package:provider/provider.dart';
 
 class AccountsPage extends StatelessWidget {
@@ -11,6 +11,9 @@ class AccountsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AccountNotifier>(context, listen: false).getData();
+    });
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
@@ -35,9 +38,45 @@ class AccountsPage extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(10),
           child: Consumer<AccountNotifier>(builder: (context, accountNot, _) {
+            if (accountNot.loading) {
+              return const Center(
+                  child: CircularProgressIndicator(color: Colors.black));
+            }
+            List<Account> accounts = accountNot.accounts();
+            if (accounts.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.account_circle_outlined,
+                      size: 100,
+                      color: Colors.black26,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      "No accounts yet",
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Add your first account using the + button",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
             return Column(
               children: [
-                ...accountNot.accounts().map((account) {
+                ...accounts.map((account) {
                   return AccountWidget(account: account);
                 })
               ],

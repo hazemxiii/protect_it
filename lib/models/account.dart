@@ -88,9 +88,6 @@ class Account {
           secKey: secKey,
           color: color);
     } catch (e) {
-      // if (e == DecryptFileErrors.wrongKey) {
-      //   rethrow;
-      // }
       return null;
     }
   }

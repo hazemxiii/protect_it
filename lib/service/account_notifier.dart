@@ -1,20 +1,15 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:fuzzywuzzy/model/extracted_result.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/backend.dart';
-import 'package:protect_it/service/file.dart';
-import 'package:protect_it/service/storage.dart';
-
-// TODO: implement internet back callback
 
 class AccountNotifier extends ChangeNotifier {
   String searchQ = "";
   List<Account> _accounts = [];
   Map<String, dynamic> deleteAttributeData = {};
-  final FileHolder f = FileHolder();
+  bool _loading = true;
+  // final FileHolder f = FileHolder();
 
   Future<bool> getData() async {
     List<Account>? accounts = await Backend().getAccounts();
@@ -22,6 +17,7 @@ class AccountNotifier extends ChangeNotifier {
       return false;
     }
     _accounts = accounts;
+    _loading = false;
     notifyListeners();
     return true;
     // await FileHolder().init();
@@ -33,6 +29,12 @@ class AccountNotifier extends ChangeNotifier {
     // } catch (e) {
     //   return false;
     // }
+  }
+
+  Future<void> logout() async {
+    _accounts = [];
+    _loading = true;
+    notifyListeners();
   }
 
   Future<void> cancel(Account account, Account old) async {
@@ -183,21 +185,23 @@ class AccountNotifier extends ChangeNotifier {
     // writeUpdate();
   }
 
-  Future<void> writeUpdate() async {
-    if (await FileHolder().updateFile(_accounts)) {
-      notifyListeners();
-    } else {
-      getData();
-    }
-  }
+  // Future<void> writeUpdate() async {
+  //   if (await FileHolder().updateFile(_accounts)) {
+  //     notifyListeners();
+  //   } else {
+  //     getData();
+  //   }
+  // }
 
-  Future<void> pickFile() async {
-    File? importedFile = await Storage().pickFile();
-    if (importedFile != null) {
-      await f.replaceFile(importedFile);
-    }
-    getData();
-  }
+  // Future<void> pickFile() async {
+  //   File? importedFile = await Storage().pickFile();
+  //   if (importedFile != null) {
+  //     await f.replaceFile(importedFile);
+  //   }
+  //   getData();
+  // }
+
+  bool get loading => _loading;
 
   void updateSearchQ(String s) {
     searchQ = s;

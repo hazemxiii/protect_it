@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/encryption.dart';
-import 'package:provider/provider.dart';
 
 class ChangeSecretDialog extends StatefulWidget {
   const ChangeSecretDialog({super.key});
@@ -46,12 +44,12 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
               "Cancel",
               style: TextStyle(color: Colors.white),
             )),
-        TextButton(
-            onPressed: _onSubmit,
-            child: const Text(
-              "Change",
-              style: TextStyle(color: Colors.white),
-            ))
+        // TextButton(
+        //     onPressed: _onSubmit,
+        //     child: const Text(
+        //       "Change",
+        //       style: TextStyle(color: Colors.white),
+        //     ))
       ],
     );
   }
@@ -99,10 +97,10 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
     });
   }
 
-  void _onSubmit() {
-    if (_formKey.currentState!.validate()) {
-      Encryption().setSecret(_newController.text);
-      Provider.of<AccountNotifier>(context, listen: false).writeUpdate();
-    }
-  }
+  // void _onSubmit() {
+  //   if (_formKey.currentState!.validate()) {
+  //     Encryption().setSecret(_newController.text);
+  //     Provider.of<AccountNotifier>(context, listen: false).writeUpdate();
+  //   }
+  // }
 }
