@@ -13,7 +13,7 @@ class Encryption {
   String? get secret => _secret;
 
   String encryptData(String plainText) {
-    final keyBytes = encrypt.Key.fromUtf8(Prefs.password!.padRight(32));
+    final keyBytes = encrypt.Key.fromUtf8(Prefs().password!.padRight(32));
     final iv = encrypt.IV.fromLength(16);
     final encrypter = encrypt.Encrypter(encrypt.AES(keyBytes));
 
@@ -27,7 +27,7 @@ class Encryption {
       final iv = encrypt.IV.fromBase64(parts[0]);
       final cipherText = parts[1];
 
-      final keyBytes = encrypt.Key.fromUtf8(Prefs.password!.padRight(32));
+      final keyBytes = encrypt.Key.fromUtf8(Prefs().password!.padRight(32));
       final encrypter = encrypt.Encrypter(encrypt.AES(keyBytes));
 
       final decrypted = encrypter.decrypt64(cipherText, iv: iv);

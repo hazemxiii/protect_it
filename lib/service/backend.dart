@@ -22,8 +22,8 @@ class Backend {
       final response = await http.post(url,
           headers: {
             "Content-Type": "application/json",
-            if (Prefs.getAccessToken().isNotEmpty)
-              "Authorization": "Bearer ${Prefs.getAccessToken()}"
+            if (Prefs().getAccessToken().isNotEmpty)
+              "Authorization": "Bearer ${Prefs().getAccessToken()}"
           },
           body: jsonEncode(data));
       dynamic r = jsonDecode(response.body);
@@ -55,12 +55,12 @@ class Backend {
     final r = await _makeRequest("/login",
         data: {"username": username, "password": password}, secure: false);
     if (r.ok) {
-      Prefs.setAccessToken(r.data['access_token']);
-      Prefs.setUsername(username);
-      Prefs.setPassword(password);
+      Prefs().setAccessToken(r.data['access_token']);
+      Prefs().setUsername(username);
+      Prefs().setPassword(password);
       return null;
     }
-    Prefs.logout();
+    Prefs().logout();
     if (r.data is Map<String, dynamic>) {
       return r.data['message'];
     }

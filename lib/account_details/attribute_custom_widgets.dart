@@ -200,6 +200,6 @@ class _EditAttributeWidgetState extends State<EditAttributeWidget> {
   }
 
   void _pickRandom(TextEditingController controller) {
-    controller.text = Prefs.getRandomPass().create();
+    controller.text = Prefs().getRandomPass().create();
   }
 }

@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Prefs.init();
+  await Prefs().init();
   runApp(const App());
 }
 
@@ -25,8 +25,8 @@ class _AppState extends State<App> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (Prefs.isLoggedIn) {
-        await Backend().login(Prefs.username!, Prefs.password!);
+      if (Prefs().isLoggedIn) {
+        await Backend().login(Prefs().username!, Prefs().password!);
         Backend().ping();
       }
       if (mounted) {
@@ -45,7 +45,7 @@ class _AppState extends State<App> {
       child: MaterialApp(
         home: _loading
             ? const LoadingPage()
-            : Prefs.isLoggedIn
+            : Prefs().isLoggedIn
                 ? const AccountsPage()
                 : const SignInPage(),
       ),

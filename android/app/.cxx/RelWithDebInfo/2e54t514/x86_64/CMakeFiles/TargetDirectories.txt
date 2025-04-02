@@ -1,0 +1,2 @@
+D:/Temp/accounts/protect_it/android/app/.cxx/RelWithDebInfo/2e54t514/x86_64/CMakeFiles/edit_cache.dir
+D:/Temp/accounts/protect_it/android/app/.cxx/RelWithDebInfo/2e54t514/x86_64/CMakeFiles/rebuild_cache.dir

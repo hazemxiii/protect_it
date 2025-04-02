@@ -10,7 +10,7 @@ class RandomPassWidget extends StatefulWidget {
 }
 
 class _RandomPassWidgetState extends State<RandomPassWidget> {
-  RandomPass randomPassGenerator = Prefs.getRandomPass();
+  RandomPass randomPassGenerator = Prefs().getRandomPass();
   // RandomPass prevState = Prefs.getRandomPass();
   late TextEditingController _controller;
   final _generatedController = TextEditingController();
@@ -129,7 +129,7 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
 
   void _applyChanges(Function onTap, dynamic v) async {
     onTap(v);
-    await Prefs.saveRandomPassData(randomPassGenerator);
+    await Prefs().saveRandomPassData(randomPassGenerator);
     setState(() {});
   }
 }

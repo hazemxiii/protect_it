@@ -160,7 +160,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _logout() {
     Provider.of<AccountNotifier>(context, listen: false).logout();
-    Prefs.logout();
+    Prefs().logout();
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const SignInPage()), (_) => false);
   }
