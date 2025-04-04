@@ -48,7 +48,7 @@ class Backend {
     if (r.data is Map<String, dynamic>) {
       return r.data['message'];
     }
-    return "Uknown Error";
+    return "Unknown Error";
   }
 
   Future<String?> login(String username, String password) async {
@@ -60,11 +60,12 @@ class Backend {
       Prefs().setPassword(password);
       return null;
     }
-    Prefs().logout();
+    // TODO: logout if the token is invalid
+    // Prefs().logout();
     if (r.data is Map<String, dynamic>) {
       return r.data['message'];
     }
-    return "Uknown Error";
+    return "Unknown Error";
   }
 
   Future<List<Account>?> getAccounts() async {

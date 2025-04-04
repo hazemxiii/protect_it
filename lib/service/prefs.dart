@@ -56,9 +56,20 @@ class Prefs {
     return _prefs.getString(_accessToken) ?? "";
   }
 
+  bool get isCached => _prefs.containsKey("cache");
+
+  void setCache(List<String> cache) {
+    _prefs.setStringList("cache", cache);
+  }
+
+  List<String> getCache() {
+    return _prefs.getStringList("cache") ?? [];
+  }
+
   bool get isLoggedIn =>
       _prefs.getString(_username) != null &&
-      _prefs.getString(_password) != null;
+      _prefs.getString(_password) != null &&
+      _prefs.getString(_accessToken) != null;
 
   void setUsername(String username) {
     _prefs.setString(_username, username);
