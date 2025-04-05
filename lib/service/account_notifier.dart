@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:fuzzywuzzy/model/extracted_result.dart';
 import 'package:protect_it/models/account.dart';
+import 'package:protect_it/models/attribute.dart';
 import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/service/prefs.dart';
 

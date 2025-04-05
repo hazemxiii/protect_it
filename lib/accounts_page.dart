@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/account_details/account_details.dart';
 import 'package:protect_it/models/account.dart';
+import 'package:protect_it/models/attribute.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/global.dart';
 import 'package:protect_it/settings_page/settings_page.dart';

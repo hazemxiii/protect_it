@@ -1,9 +1,9 @@
 import 'dart:convert';
-
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/service/prefs.dart';
+import 'package:protect_it/widgets/logout_snackbar.dart';
 
 class Backend {
   Backend._();
@@ -13,6 +13,8 @@ class Backend {
   final String _url = "account-safe-api.vercel.app";
   // final String _url = "127.0.0.1:5000";
   final bool _secure = true;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   Future<Response> _makeRequest(String path,
       {Map<String, dynamic>? data, bool secure = true}) async {
@@ -27,6 +29,11 @@ class Backend {
           },
           body: jsonEncode(data));
       dynamic r = jsonDecode(response.body);
+      if (r is Map<String, dynamic>) {
+        if (r['message'] == "Invalid token") {
+          _logout();
+        }
+      }
       return Response(ok: response.statusCode == 200, data: r);
     } catch (e) {
       return Response(ok: false, data: e.toString());
@@ -55,15 +62,15 @@ class Backend {
     final r = await _makeRequest("/login",
         data: {"username": username, "password": password}, secure: false);
     if (r.ok) {
-      Prefs().setAccessToken(r.data['access_token']);
-      Prefs().setUsername(username);
-      Prefs().setPassword(password);
+      Prefs().login(username, password, r.data['access_token']);
       return null;
     }
-    // TODO: logout if the token is invalid
-    // Prefs().logout();
     if (r.data is Map<String, dynamic>) {
-      return r.data['message'];
+      String message = r.data['message'];
+      // if (message == "Invalid token") {
+      //   Prefs().logout();
+      // }
+      return message;
     }
     return "Unknown Error";
   }
@@ -94,6 +101,17 @@ class Backend {
   Future<Response> deleteAccount(String id) async {
     final r = await _makeRequest("/accounts/delete", data: {"id": id});
     return r;
+  }
+
+  void _logout() {
+    Prefs().logout();
+    scaffoldMessengerKey.currentState?.clearSnackBars();
+    scaffoldMessengerKey.currentState?.showSnackBar(_signOutWidget());
+  }
+
+  SnackBar _signOutWidget() {
+    return const SnackBar(
+        behavior: SnackBarBehavior.floating, content: LogoutSnackbar());
   }
 }
 

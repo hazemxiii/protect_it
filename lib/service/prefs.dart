@@ -4,11 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Prefs {
   static final Prefs _instance = Prefs._();
   late SharedPreferences _prefs;
-
   static const String _dontShowAgain = "dontShowAgain";
   static const String _accessToken = "accessToken";
   static const String _username = "username";
   static const String _password = "password";
+  static const String _cache = "cache";
 
   Prefs._();
 
@@ -44,6 +44,12 @@ class Prefs {
     return _prefs.getBool(_dontShowAgain) ?? false;
   }
 
+  void login(String username, String password, String token) {
+    _prefs.setString(_username, username);
+    _prefs.setString(_password, password);
+    _prefs.setString(_accessToken, token);
+  }
+
   void setDontShowAgain(bool v) {
     _prefs.setBool(_dontShowAgain, v);
   }
@@ -56,14 +62,14 @@ class Prefs {
     return _prefs.getString(_accessToken) ?? "";
   }
 
-  bool get isCached => _prefs.containsKey("cache");
+  bool get isCached => _prefs.containsKey(_cache);
 
   void setCache(List<String> cache) {
-    _prefs.setStringList("cache", cache);
+    _prefs.setStringList(_cache, cache);
   }
 
   List<String> getCache() {
-    return _prefs.getStringList("cache") ?? [];
+    return _prefs.getStringList(_cache) ?? [];
   }
 
   bool get isLoggedIn =>
@@ -87,5 +93,6 @@ class Prefs {
     _prefs.remove(_accessToken);
     _prefs.remove(_username);
     _prefs.remove(_password);
+    _prefs.remove(_cache);
   }
 }

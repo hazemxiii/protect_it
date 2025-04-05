@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:protect_it/account_details/account_details.dart';
 import 'package:protect_it/account_details/attribute_custom_widgets.dart';
 import 'package:protect_it/models/account.dart';
+import 'package:protect_it/models/attribute.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/global.dart';
 import 'package:provider/provider.dart';

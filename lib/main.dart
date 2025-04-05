@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/accounts_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
-import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/sign_in_page.dart';
 import 'package:provider/provider.dart';
+import 'package:protect_it/service/backend.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +26,8 @@ class _AppState extends State<App> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (Prefs().isLoggedIn) {
-        await Backend().login(Prefs().username!, Prefs().password!);
-        Backend().ping();
+        // await Backend().login(Prefs().username!, Prefs().password!);
+        // Backend().ping();
       }
       if (mounted) {
         setState(() {
@@ -43,6 +43,7 @@ class _AppState extends State<App> {
     return ChangeNotifierProvider(
       create: (context) => AccountNotifier(),
       child: MaterialApp(
+        scaffoldMessengerKey: Backend().scaffoldMessengerKey,
         home: _loading
             ? const LoadingPage()
             : Prefs().isLoggedIn
