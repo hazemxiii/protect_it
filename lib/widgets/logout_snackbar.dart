@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/sign_in_page.dart';
 
 class LogoutSnackbar extends StatefulWidget {
@@ -21,25 +22,41 @@ class _LogoutSnackbarState extends State<LogoutSnackbar>
     _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
     _controller.forward();
     _controller.addListener(() {
-      setState(() {});
       if (_controller.isCompleted) {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const SignInPage()));
       }
+      setState(() {});
     });
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    const style = TextStyle(color: Colors.blue);
     return Column(
       children: [
         Row(
           children: [
-            Text("Your session has expired. Please sign in again."),
-            TextButton(onPressed: () {}, child: Text("Sign in again")),
+            const Text("Your session has expired. Please sign in again.",
+                style: style),
+            TextButton(
+                onPressed: () {
+                  Backend().scaffoldMessengerKey.currentState?.clearSnackBars();
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const SignInPage()),
+                      (_) => false);
+                },
+                child: const Text("Sign in again", style: style)),
           ],
         ),
         LinearProgressIndicator(
+          color: Colors.blue,
           value: _animation.value,
           minHeight: 2,
         )

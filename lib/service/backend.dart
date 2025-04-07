@@ -110,8 +110,11 @@ class Backend {
   }
 
   SnackBar _signOutWidget() {
-    return const SnackBar(
-        behavior: SnackBarBehavior.floating, content: LogoutSnackbar());
+    return SnackBar(
+        duration: const Duration(seconds: 5),
+        backgroundColor: Color.lerp(Colors.blue, Colors.white, 0.9),
+        behavior: SnackBarBehavior.floating,
+        content: const LogoutSnackbar());
   }
 }
 
