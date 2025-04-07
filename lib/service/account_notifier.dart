@@ -2,47 +2,67 @@ import 'package:flutter/material.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:fuzzywuzzy/model/extracted_result.dart';
 import 'package:protect_it/models/account.dart';
+import 'package:protect_it/models/attribute.dart';
 import 'package:protect_it/service/backend.dart';
+import 'package:protect_it/service/prefs.dart';
 
 class AccountNotifier extends ChangeNotifier {
   String searchQ = "";
   List<Account> _accounts = [];
   Map<String, dynamic> deleteAttributeData = {};
   bool _loading = true;
-  // final FileHolder f = FileHolder();
 
   Future<bool> getData() async {
+    getCachedData();
     List<Account>? accounts = await Backend().getAccounts();
     if (accounts == null) {
       return false;
     }
+    if ((accounts).isNotEmpty) _accounts = accounts;
+    _loading = false;
+    dataUpdated();
+    return true;
+  }
+
+  void getCachedData() {
+    if (!Prefs().isCached) {
+      return;
+    }
+    List<String> cache = Prefs().getCache();
+    if (cache.isEmpty) {
+      return;
+    }
+    List<Account> accounts = [];
+    for (String c in cache) {
+      Account? account = Account.fromJSON(c);
+      if (account != null) {
+        accounts.add(account);
+      }
+    }
     _accounts = accounts;
     _loading = false;
     notifyListeners();
-    return true;
-    // await FileHolder().init();
-    // try {
-    //   List<Account> data = await FileHolder().getData();
-    //   _accounts = data;
-    //   notifyListeners();
-    //   return true;
-    // } catch (e) {
-    //   return false;
-    // }
+  }
+
+  void updateCache() {
+    List<String> cache = [];
+    for (Account a in _accounts) {
+      cache.add(a.toJSON());
+    }
+    Prefs().setCache(cache);
   }
 
   Future<void> logout() async {
     _accounts = [];
     _loading = true;
-    notifyListeners();
+    dataUpdated();
   }
 
   Future<void> cancel(Account account, Account old) async {
     int i = _accounts.indexOf(account);
     _accounts.removeAt(i);
     _accounts.insert(i, old);
-    notifyListeners();
-
+    dataUpdated();
     Response d = await Backend().deleteAccount(account.id);
     Response r = await Backend().setAccount(account);
     if (!d.ok) {}
@@ -52,7 +72,7 @@ class AccountNotifier extends ChangeNotifier {
 
   Future<void> addAccount(Account account) async {
     _accounts.add(account);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -61,7 +81,7 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> setSensitive(
       Account account, Attribute attribute, bool v) async {
     attribute.updateSensitivity(v);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -69,7 +89,7 @@ class AccountNotifier extends ChangeNotifier {
 
   Future<void> setMain(Account account, String key) async {
     account.setMain(key);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -77,7 +97,7 @@ class AccountNotifier extends ChangeNotifier {
 
   Future<void> setSec(Account account, String key) async {
     account.setSec(key);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -86,7 +106,7 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> updateValue(
       Account account, String value, Attribute attr) async {
     attr.updateValue(value);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -105,7 +125,7 @@ class AccountNotifier extends ChangeNotifier {
       account.setSec(newKey);
     }
     account.attributes.remove(oldKey);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -113,7 +133,7 @@ class AccountNotifier extends ChangeNotifier {
 
   Future<void> updateColor(Account account, Color c) async {
     account.updateColor(c);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -121,7 +141,7 @@ class AccountNotifier extends ChangeNotifier {
 
   Future<void> deleteAccount(Account account) async {
     _accounts.remove(account);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().deleteAccount(account.id);
     if (!r.ok) {}
     // writeUpdate();
@@ -136,7 +156,7 @@ class AccountNotifier extends ChangeNotifier {
       name = "newAttribute_${number + 1}";
     }
     account.addAttributes({name: attr});
-    notifyListeners();
+    dataUpdated();
     Backend().setAccount(account).then((r) {
       if (!r.ok) {}
     });
@@ -152,7 +172,7 @@ class AccountNotifier extends ChangeNotifier {
     deleteAttributeData['account'] = account;
     deleteAttributeData['attribute'] = attr;
     deleteAttributeData['key'] = attributeKey;
-    notifyListeners();
+    dataUpdated();
     Backend().setAccount(account).then((r) {
       if (!r.ok) {}
     });
@@ -170,7 +190,7 @@ class AccountNotifier extends ChangeNotifier {
     }
     deleteAttributeData = {};
     if (account != null) {
-      notifyListeners();
+      dataUpdated();
       Response r = await Backend().setAccount(account);
       if (!r.ok) {}
     }
@@ -179,7 +199,7 @@ class AccountNotifier extends ChangeNotifier {
 
   Future<void> updateName(Account account, String newName) async {
     account.updateName(newName);
-    notifyListeners();
+    dataUpdated();
     Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
@@ -200,6 +220,11 @@ class AccountNotifier extends ChangeNotifier {
   //   }
   //   getData();
   // }
+
+  void dataUpdated() {
+    updateCache();
+    notifyListeners();
+  }
 
   bool get loading => _loading;
 

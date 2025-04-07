@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:protect_it/models/attribute.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:protect_it/service/encryption.dart';
@@ -160,40 +161,4 @@ class Account {
   String get secKey => _secKey;
   String get id => _id;
   Color get color => _color;
-}
-
-class Attribute {
-  Attribute({
-    required this.value,
-    this.isSensitive = false,
-  });
-
-  String value;
-  bool isSensitive;
-
-  String toJSON() {
-    Map<String, String> map = {};
-    map['sensitive'] = isSensitive.toString();
-    map['value'] = Encryption().encryptData(value);
-    return jsonEncode(map);
-  }
-
-  static Attribute? fromJSON(String json) {
-    try {
-      Map map = jsonDecode(json);
-      return Attribute(
-          value: Encryption().decryptData(map['value']!),
-          isSensitive: (map['sensitive']!) == "true");
-    } catch (e) {
-      return null;
-    }
-  }
-
-  void updateValue(String value) {
-    this.value = value;
-  }
-
-  void updateSensitivity(bool isSensitive) {
-    this.isSensitive = isSensitive;
-  }
 }
