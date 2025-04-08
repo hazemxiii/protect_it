@@ -222,8 +222,8 @@ class AccountNotifier extends ChangeNotifier {
   // }
 
   void dataUpdated() {
-    updateCache();
     notifyListeners();
+    updateCache();
   }
 
   bool get loading => _loading;

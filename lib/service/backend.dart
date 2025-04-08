@@ -9,18 +9,18 @@ class Backend {
   Backend._();
   static final _instance = Backend._();
   factory Backend() => _instance;
-
   final String _url = "account-safe-api.vercel.app";
   // final String _url = "127.0.0.1:5000";
-  final bool _secure = true;
+  // final bool _secure = false;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
   Future<Response> _makeRequest(String path,
-      {Map<String, dynamic>? data, bool secure = true}) async {
+      {Map<String, dynamic>? data, bool authorized = true}) async {
+    bool secure = !_url.contains("127.0.0");
     data ??= {};
     try {
-      final url = _secure ? Uri.https(_url, path) : Uri.http(_url, path);
+      final url = secure ? Uri.https(_url, path) : Uri.http(_url, path);
       final response = await http.post(url,
           headers: {
             "Content-Type": "application/json",
@@ -48,7 +48,7 @@ class Backend {
 
   Future<String?> register(String username, String password) async {
     final r = await _makeRequest("/register",
-        data: {"username": username, "password": password}, secure: false);
+        data: {"username": username, "password": password}, authorized: false);
     if (r.ok) {
       return null;
     }
@@ -60,7 +60,7 @@ class Backend {
 
   Future<String?> login(String username, String password) async {
     final r = await _makeRequest("/login",
-        data: {"username": username, "password": password}, secure: false);
+        data: {"username": username, "password": password}, authorized: false);
     if (r.ok) {
       Prefs().login(username, password, r.data['access_token']);
       return null;
