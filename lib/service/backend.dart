@@ -9,18 +9,19 @@ class Backend {
   Backend._();
   static final _instance = Backend._();
   factory Backend() => _instance;
-  final String _url = "account-safe-api.vercel.app";
-  // final String _url = "127.0.0.1:5000";
-  // final bool _secure = false;
+  bool? _otpEnabled;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
   Future<Response> _makeRequest(String path,
       {Map<String, dynamic>? data, bool authorized = true}) async {
-    bool secure = !_url.contains("127.0.0");
+    bool secure = false;
+    // ignore: dead_code
+    String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
     data ??= {};
     try {
-      final url = secure ? Uri.https(_url, path) : Uri.http(_url, path);
+      // ignore: dead_code
+      final url = secure ? Uri.https(mainPath, path) : Uri.http(mainPath, path);
       final response = await http.post(url,
           headers: {
             "Content-Type": "application/json",
@@ -92,6 +93,26 @@ class Backend {
     return [];
   }
 
+  Future<bool> getOtpSettings() async {
+    // final r = await _makeRequest("/privacy");
+    // TODO: get from database
+    final r = Response(ok: true, data: {"otp": true});
+    if (r.ok) {
+      return r.data['otp'];
+    }
+    return false;
+  }
+
+  Future<bool?> setOtp(bool otp) async {
+    // TODO: set otp
+    // final r = await _makeRequest("/otp/set", data: {"otp": otp});
+    final r = Response(ok: true, data: {"otp": otp});
+    if (r.ok) {
+      return r.data['otp'];
+    }
+    return null;
+  }
+
   Future<Response> setAccount(Account account) async {
     final r = await _makeRequest("/accounts/set",
         data: {"account": account.toJSON(), "id": account.id});
@@ -115,6 +136,11 @@ class Backend {
         backgroundColor: Color.lerp(Colors.blue, Colors.white, 0.9),
         behavior: SnackBarBehavior.floating,
         content: const LogoutSnackbar());
+  }
+
+  Future<bool> get otpEnabled async {
+    _otpEnabled ??= await getOtpSettings();
+    return _otpEnabled!;
   }
 }
 
