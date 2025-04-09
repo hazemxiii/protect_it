@@ -10,14 +10,26 @@ class OtpPage extends StatefulWidget {
 
 class _OtpPageState extends State<OtpPage> {
   final List<TextEditingController> _controllers = [];
-  final List<String> _otp = [];
+  int _length = 0;
   final List<FocusNode> _focusNodes = [];
+  int _focusedIndex = 0;
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNodes[0].requestFocus();
+    });
     for (int i = 0; i < 6; i++) {
       _controllers.add(TextEditingController());
-      _focusNodes.add(FocusNode());
+      FocusNode focusNode = FocusNode();
+      focusNode.addListener(() {
+        if (focusNode.hasFocus) {
+          setState(() {
+            _focusedIndex = i;
+          });
+        }
+      });
+      _focusNodes.add(focusNode);
     }
     super.initState();
   }
@@ -30,9 +42,7 @@ class _OtpPageState extends State<OtpPage> {
     super.dispose();
   }
 
-  BorderSide enabledSide = const BorderSide(color: Colors.black);
-  BorderSide disabledSide =
-      BorderSide(color: Color.lerp(Colors.black, Colors.white, 0.95)!);
+  BorderSide side = const BorderSide(color: Colors.black);
 
   double size = 50;
 
@@ -41,21 +51,44 @@ class _OtpPageState extends State<OtpPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          alignment: WrapAlignment.center,
-          direction: Axis.horizontal,
-          children: List.generate(6, (index) => _otpField(index)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _titleWidget(),
+            const SizedBox(height: 10),
+            _subtitleWidget(),
+            const SizedBox(height: 20),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              alignment: WrapAlignment.center,
+              direction: Axis.horizontal,
+              children: List.generate(6, (index) => _otpField(index)),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  Widget _titleWidget() {
+    return const Text(
+      "Enter Verifiction Code",
+      style: TextStyle(
+          fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+    );
+  }
+
+  Widget _subtitleWidget() {
+    return Text(
+      "Enter the 6-digit verification code sent to your email",
+      style: TextStyle(
+          fontSize: 16, color: Color.lerp(Colors.white, Colors.black, 0.5)),
+    );
+  }
+
   Widget _otpField(int index) {
-    // TODO: get focus
-    // TODO: get otp
-    bool isFilled = _focusNodes[index].hasFocus;
+    bool isFilled = _focusedIndex == index;
     return SizedBox(
       width: size,
       height: size,
@@ -66,10 +99,12 @@ class _OtpPageState extends State<OtpPage> {
             return _formatter(index, oldValue, newValue);
           })
         ],
+        onChanged: (v) => _submit(v),
         focusNode: _focusNodes[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         textInputAction: TextInputAction.next,
+        cursorColor: isFilled ? Colors.white : Colors.black,
         controller: _controllers[index],
         style: TextStyle(
             fontSize: 20, color: isFilled ? Colors.white : Colors.black),
@@ -77,7 +112,10 @@ class _OtpPageState extends State<OtpPage> {
           fillColor: Colors.black,
           filled: isFilled,
           border: OutlineInputBorder(
-            borderSide: disabledSide,
+            borderSide: side,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: side,
           ),
         ),
       ),
@@ -96,8 +134,15 @@ class _OtpPageState extends State<OtpPage> {
     return newValue;
   }
 
-  void _submit() {
-    String otp = _controllers.map((e) => e.text).join();
-    print(otp);
+  void _submit(String v) {
+    if (v.isNotEmpty) {
+      _length++;
+    } else {
+      _length--;
+    }
+    if (_length == 6) {
+      String otp = _controllers.map((e) => e.text).join();
+      // TODO: submit otp
+    }
   }
 }
