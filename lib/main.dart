@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/accounts_page.dart';
-import 'package:protect_it/otp_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/sign_in_page.dart';

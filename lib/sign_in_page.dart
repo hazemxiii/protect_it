@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/accounts_page.dart';
+import 'package:protect_it/otp_page.dart';
 import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/sign_up_page.dart';
 
@@ -125,11 +126,22 @@ class _SignInPageState extends State<SignInPage> {
         );
       }
     } else {
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AccountsPage()),
-      );
+      if (Backend().otpEnabled) {
+        if (!mounted) return;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => OtpPage(
+                    username: _usernameController.text,
+                    password: _passwordController.text,
+                  )),
+        );
+      } else {
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AccountsPage()),
+        );
+      }
     }
   }
 }

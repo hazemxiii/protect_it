@@ -13,7 +13,7 @@ class PrivacySectionWidget extends StatelessWidget {
           children: [
             PrivacySectionButton(
                 text: "OTP",
-                isEnabled: Backend().otpEnabled,
+                isEnabled: Future.value(Backend().otpEnabled),
                 onPressed: _setOtp),
             PrivacySectionButton(
                 text: "Biometric",
@@ -26,7 +26,9 @@ class PrivacySectionWidget extends StatelessWidget {
   }
 
   Future<bool?> _setOtp(bool v) async {
-    return await Backend().setOtp(v);
+    bool? b = await Backend().setOtp(v);
+    print(b);
+    return b;
   }
 
   Future<bool?> _setBiometric(bool v) async {

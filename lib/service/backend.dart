@@ -59,12 +59,17 @@ class Backend {
     return "Unknown Error";
   }
 
-  Future<String?> login(String username, String password) async {
-    // TODO: get otp enabled here
+  Future<String?> login(String username, String password, {String? otp}) async {
     final r = await _makeRequest("/login",
-        data: {"username": username, "password": password}, authorized: false);
+        data: {"username": username, "password": password, "otp": otp},
+        authorized: false);
+    debugPrint(r.data.toString());
     if (r.ok) {
-      Prefs().login(username, password, r.data['access_token']);
+      if ((r.data as Map<String, dynamic>).containsKey('access_token')) {
+        Prefs().login(username, password, r.data['access_token']);
+        return null;
+      }
+      _otpEnabled = r.data['otpEnabled'];
       return null;
     }
     if (r.data is Map<String, dynamic>) {
@@ -94,32 +99,10 @@ class Backend {
     return [];
   }
 
-  Future<bool> getOtpSettings() async {
-    // final r = await _makeRequest("/privacy");
-    // TODO: get from database
-    final r = Response(ok: true, data: {"otp": true});
-    if (r.ok) {
-      return r.data['otp'];
-    }
-    return false;
-  }
-
   Future<bool?> setOtp(bool otp) async {
-    // TODO: set otp
-    // final r = await _makeRequest("/otp/set", data: {"otp": otp});
-    final r = Response(ok: true, data: {"otp": otp});
+    final r = await _makeRequest("/otp/set", data: {"otp": otp});
     if (r.ok) {
       return r.data['otp'];
-    }
-    return null;
-  }
-
-  Future<bool?> submitOtp(String otp) async {
-    // TODO: submit otp
-    // final r = await _makeRequest("/otp/submit", data: {"otp": otp});
-    final r = Response(ok: true, data: {"success": true});
-    if (r.ok) {
-      return r.data['success'];
     }
     return null;
   }
@@ -149,8 +132,8 @@ class Backend {
         content: const LogoutSnackbar());
   }
 
-  Future<bool> get otpEnabled async {
-    _otpEnabled ??= await getOtpSettings();
+  bool get otpEnabled {
+    _otpEnabled ??= false;
     return _otpEnabled!;
   }
 }

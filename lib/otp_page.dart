@@ -4,7 +4,9 @@ import 'package:protect_it/accounts_page.dart';
 import 'package:protect_it/service/backend.dart';
 
 class OtpPage extends StatefulWidget {
-  const OtpPage({super.key});
+  final String username;
+  final String password;
+  const OtpPage({super.key, required this.username, required this.password});
 
   @override
   State<OtpPage> createState() => _OtpPageState();
@@ -144,24 +146,20 @@ class _OtpPageState extends State<OtpPage> {
     }
     if (_length == 6) {
       String otp = _controllers.map((e) => e.text).join();
-      bool? success = await Backend().submitOtp(otp);
-
+      String? error =
+          await Backend().login(widget.username, widget.password, otp: otp);
+// TODO: get otp if user was already logged in
       if (!mounted) return;
 
-      if (success == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Error reaching server")));
-        return;
-      }
-
-      if (success == true) {
+      if (error == null) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const AccountsPage()),
             (route) => false);
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Invalid OTP")));
+        return;
       }
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error)));
     }
   }
 }
