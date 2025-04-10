@@ -125,12 +125,11 @@ class _SignInPageState extends State<SignInPage> {
         );
       }
     } else {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AccountsPage()),
-        );
-      }
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AccountsPage()),
+      );
     }
   }
 }

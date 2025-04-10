@@ -45,12 +45,11 @@ class _AppState extends State<App> {
       create: (context) => AccountNotifier(),
       child: MaterialApp(
         scaffoldMessengerKey: Backend().scaffoldMessengerKey,
-        home: const OtpPage(),
-        // home: _loading
-        //     ? const LoadingPage()
-        //     : Prefs().isLoggedIn
-        //         ? const AccountsPage()
-        //         : const SignInPage(),
+        home: _loading
+            ? const LoadingPage()
+            : Prefs().isLoggedIn
+                ? const AccountsPage()
+                : const SignInPage(),
       ),
     );
   }

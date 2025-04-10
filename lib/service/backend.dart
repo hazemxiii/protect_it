@@ -60,6 +60,7 @@ class Backend {
   }
 
   Future<String?> login(String username, String password) async {
+    // TODO: get otp enabled here
     final r = await _makeRequest("/login",
         data: {"username": username, "password": password}, authorized: false);
     if (r.ok) {
@@ -109,6 +110,16 @@ class Backend {
     final r = Response(ok: true, data: {"otp": otp});
     if (r.ok) {
       return r.data['otp'];
+    }
+    return null;
+  }
+
+  Future<bool?> submitOtp(String otp) async {
+    // TODO: submit otp
+    // final r = await _makeRequest("/otp/submit", data: {"otp": otp});
+    final r = Response(ok: true, data: {"success": true});
+    if (r.ok) {
+      return r.data['success'];
     }
     return null;
   }

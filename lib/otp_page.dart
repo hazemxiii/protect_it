@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:protect_it/accounts_page.dart';
+import 'package:protect_it/service/backend.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
@@ -134,7 +136,7 @@ class _OtpPageState extends State<OtpPage> {
     return newValue;
   }
 
-  void _submit(String v) {
+  void _submit(String v) async {
     if (v.isNotEmpty) {
       _length++;
     } else {
@@ -142,7 +144,24 @@ class _OtpPageState extends State<OtpPage> {
     }
     if (_length == 6) {
       String otp = _controllers.map((e) => e.text).join();
-      // TODO: submit otp
+      bool? success = await Backend().submitOtp(otp);
+
+      if (!mounted) return;
+
+      if (success == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Error reaching server")));
+        return;
+      }
+
+      if (success == true) {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const AccountsPage()),
+            (route) => false);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Invalid OTP")));
+      }
     }
   }
 }
