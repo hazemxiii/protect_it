@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:protect_it/service/backend.dart';
 
 class PrivacySectionButton extends StatefulWidget {
   final String text;
-  final Future<bool> isEnabled;
-  final Future<bool?> Function(bool) onPressed;
+  final bool isOtp;
+  final Future<String?> Function(bool) onPressed;
   const PrivacySectionButton(
       {super.key,
       required this.text,
-      required this.isEnabled,
+      required this.isOtp,
       required this.onPressed});
 
   @override
@@ -17,8 +18,8 @@ class PrivacySectionButton extends StatefulWidget {
 class _PrivacySectionButtonState extends State<PrivacySectionButton> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: widget.isEnabled,
+    return FutureBuilder<bool>(
+        future: widget.isOtp ? Backend().otpEnabled : Future.value(false),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return MaterialButton(
@@ -46,14 +47,14 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
   }
 
   void _onPressed(bool v) async {
-    bool? b = await widget.onPressed(v);
+    String? b = await widget.onPressed(v);
     print(b);
-    if (b != null) {
+    if (b == null) {
       setState(() {});
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Failed to update")));
+            .showSnackBar(const SnackBar(content: Text("Failed to Updated")));
       }
     }
   }

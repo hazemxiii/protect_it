@@ -12,12 +12,10 @@ class PrivacySectionWidget extends StatelessWidget {
         content: Column(
           children: [
             PrivacySectionButton(
-                text: "OTP",
-                isEnabled: Future.value(Backend().otpEnabled),
-                onPressed: _setOtp),
+                isOtp: true, onPressed: (v) => _setOtp(v), text: "OTP"),
             PrivacySectionButton(
                 text: "Biometric",
-                isEnabled: Future.value(false),
+                isOtp: false,
                 onPressed: (v) => _setBiometric(v)),
           ],
         ),
@@ -25,13 +23,16 @@ class PrivacySectionWidget extends StatelessWidget {
         hint: "Extra Privacy Steps");
   }
 
-  Future<bool?> _setOtp(bool v) async {
+  Future<String?> _setOtp(bool v) async {
     bool? b = await Backend().setOtp(v);
-    print(b);
-    return b;
+    if (b == null) {
+      return "Failed to update";
+    }
+    return null;
   }
 
-  Future<bool?> _setBiometric(bool v) async {
-    return true;
+  Future<String?> _setBiometric(bool v) async {
+    // return true;
+    return null;
   }
 }

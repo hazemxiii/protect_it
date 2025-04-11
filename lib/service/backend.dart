@@ -102,6 +102,7 @@ class Backend {
   Future<bool?> setOtp(bool otp) async {
     final r = await _makeRequest("/otp/set", data: {"otp": otp});
     if (r.ok) {
+      _otpEnabled = r.data['otp'];
       return r.data['otp'];
     }
     return null;
@@ -132,9 +133,16 @@ class Backend {
         content: const LogoutSnackbar());
   }
 
-  bool get otpEnabled {
-    _otpEnabled ??= false;
-    return _otpEnabled!;
+  Future<bool> get otpEnabled async {
+    print("calling get otp enabled");
+    if (_otpEnabled != null) {
+      return _otpEnabled!;
+    }
+    final r = await _makeRequest("/otp/get");
+    if (r.ok) {
+      _otpEnabled = r.data['otp'];
+    }
+    return _otpEnabled ?? false;
   }
 }
 

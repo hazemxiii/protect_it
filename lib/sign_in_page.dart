@@ -126,7 +126,7 @@ class _SignInPageState extends State<SignInPage> {
         );
       }
     } else {
-      if (Backend().otpEnabled) {
+      if (await Backend().otpEnabled) {
         if (!mounted) return;
         Navigator.of(context).push(
           MaterialPageRoute(

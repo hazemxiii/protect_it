@@ -148,7 +148,6 @@ class _OtpPageState extends State<OtpPage> {
       String otp = _controllers.map((e) => e.text).join();
       String? error =
           await Backend().login(widget.username, widget.password, otp: otp);
-// TODO: get otp if user was already logged in
       if (!mounted) return;
 
       if (error == null) {
