@@ -9,18 +9,19 @@ class Backend {
   Backend._();
   static final _instance = Backend._();
   factory Backend() => _instance;
-  final String _url = "account-safe-api.vercel.app";
-  // final String _url = "127.0.0.1:5000";
-  // final bool _secure = false;
+  bool? _otpEnabled;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
   Future<Response> _makeRequest(String path,
       {Map<String, dynamic>? data, bool authorized = true}) async {
-    bool secure = !_url.contains("127.0.0");
+    bool secure = true;
+    // ignore: dead_code
+    String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
     data ??= {};
     try {
-      final url = secure ? Uri.https(_url, path) : Uri.http(_url, path);
+      // ignore: dead_code
+      final url = secure ? Uri.https(mainPath, path) : Uri.http(mainPath, path);
       final response = await http.post(url,
           headers: {
             "Content-Type": "application/json",
@@ -58,11 +59,17 @@ class Backend {
     return "Unknown Error";
   }
 
-  Future<String?> login(String username, String password) async {
+  Future<String?> login(String username, String password, {String? otp}) async {
     final r = await _makeRequest("/login",
-        data: {"username": username, "password": password}, authorized: false);
+        data: {"username": username, "password": password, "otp": otp},
+        authorized: false);
+    debugPrint(r.data.toString());
     if (r.ok) {
-      Prefs().login(username, password, r.data['access_token']);
+      if ((r.data as Map<String, dynamic>).containsKey('access_token')) {
+        Prefs().login(username, password, r.data['access_token']);
+        return null;
+      }
+      _otpEnabled = r.data['otpEnabled'];
       return null;
     }
     if (r.data is Map<String, dynamic>) {
@@ -92,6 +99,15 @@ class Backend {
     return [];
   }
 
+  Future<bool?> setOtp(bool otp) async {
+    final r = await _makeRequest("/otp/set", data: {"otp": otp});
+    if (r.ok) {
+      _otpEnabled = r.data['otp'];
+      return r.data['otp'];
+    }
+    return null;
+  }
+
   Future<Response> setAccount(Account account) async {
     final r = await _makeRequest("/accounts/set",
         data: {"account": account.toJSON(), "id": account.id});
@@ -115,6 +131,17 @@ class Backend {
         backgroundColor: Color.lerp(Colors.blue, Colors.white, 0.9),
         behavior: SnackBarBehavior.floating,
         content: const LogoutSnackbar());
+  }
+
+  Future<bool> get otpEnabled async {
+    if (_otpEnabled != null) {
+      return _otpEnabled!;
+    }
+    final r = await _makeRequest("/otp/get");
+    if (r.ok) {
+      _otpEnabled = r.data['otp'];
+    }
+    return _otpEnabled ?? false;
   }
 }
 
