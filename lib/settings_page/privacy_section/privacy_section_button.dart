@@ -48,7 +48,6 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
 
   void _onPressed(bool v) async {
     String? b = await widget.onPressed(v);
-    print(b);
     if (b == null) {
       setState(() {});
     } else {

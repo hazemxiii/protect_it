@@ -15,7 +15,7 @@ class Backend {
 
   Future<Response> _makeRequest(String path,
       {Map<String, dynamic>? data, bool authorized = true}) async {
-    bool secure = false;
+    bool secure = true;
     // ignore: dead_code
     String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
     data ??= {};
@@ -134,7 +134,6 @@ class Backend {
   }
 
   Future<bool> get otpEnabled async {
-    print("calling get otp enabled");
     if (_otpEnabled != null) {
       return _otpEnabled!;
     }
