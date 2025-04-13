@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/service/backend.dart';
+import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/settings_page/privacy_section/privacy_section_button.dart';
 import 'package:protect_it/settings_page/settings_page.dart';
 
@@ -32,7 +33,7 @@ class PrivacySectionWidget extends StatelessWidget {
   }
 
   Future<String?> _setBiometric(bool v) async {
-    // return true;
+    Prefs().setBio(v);
     return null;
   }
 }

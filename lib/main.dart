@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:protect_it/accounts_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
+import 'package:protect_it/service/bio.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/sign_in_page.dart';
 import 'package:provider/provider.dart';
@@ -26,8 +29,12 @@ class _AppState extends State<App> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (Prefs().isLoggedIn) {
-        // await Backend().login(Prefs().username!, Prefs().password!);
-        // Backend().ping();
+        if (Prefs().isBioActive) {
+          bool b = await Bio().authenticate();
+          if (!b) {
+            exit(0);
+          }
+        }
       }
       if (mounted) {
         setState(() {
