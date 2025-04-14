@@ -10,6 +10,7 @@ class Prefs {
   static const String _password = "password";
   static const String _cache = "cache";
   static const String _bio = "bio";
+  static const String _pin = "pin";
 
   Prefs._();
 
@@ -55,6 +56,10 @@ class Prefs {
     _prefs.setBool(_bio, v);
   }
 
+  void setPin(String pin) {
+    _prefs.setString(_pin, pin);
+  }
+
   void setDontShowAgain(bool v) {
     _prefs.setBool(_dontShowAgain, v);
   }
@@ -89,6 +94,7 @@ class Prefs {
   bool get isBioActive => _prefs.getBool(_bio) ?? false;
 
   String? get username => _prefs.getString(_username);
+  String? get pin => _prefs.getString(_pin);
 
   void setPassword(String password) {
     _prefs.setString(_password, password);

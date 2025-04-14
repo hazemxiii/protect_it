@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:protect_it/accounts_page.dart';
+import 'package:protect_it/pin_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/bio.dart';
 import 'package:protect_it/service/prefs.dart';
@@ -47,15 +48,22 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = const SignInPage();
+    if (Prefs().isLoggedIn) {
+      if (Prefs().pin != null) {
+        child = const PinPage();
+      } else {
+        child = const AccountsPage();
+      }
+    }
+    if (_loading) {
+      child = const LoadingPage();
+    }
     return ChangeNotifierProvider(
       create: (context) => AccountNotifier(),
       child: MaterialApp(
         scaffoldMessengerKey: Backend().scaffoldMessengerKey,
-        home: _loading
-            ? const LoadingPage()
-            : Prefs().isLoggedIn
-                ? const AccountsPage()
-                : const SignInPage(),
+        home: child,
       ),
     );
   }
