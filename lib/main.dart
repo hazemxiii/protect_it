@@ -63,7 +63,7 @@ class _AppState extends State<App> {
       create: (context) => AccountNotifier(),
       child: MaterialApp(
         scaffoldMessengerKey: Backend().scaffoldMessengerKey,
-        home: const PinPage(),
+        home: child,
       ),
     );
   }

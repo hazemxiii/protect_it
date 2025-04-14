@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:protect_it/accounts_page.dart';
+import 'package:protect_it/service/prefs.dart';
 
 class PinPage extends StatelessWidget {
   const PinPage({super.key});
@@ -78,16 +80,16 @@ class PinKeyboard extends StatelessWidget {
       child: GridView(
         gridDelegate:
             const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-        children: _children,
+        children: _children(context),
       ),
     );
   }
 
-  List<Widget> get _children {
-    return List.generate(12, (index) => _key(index));
+  List<Widget> _children(BuildContext context) {
+    return List.generate(12, (index) => _key(index, context));
   }
 
-  Widget _key(int index) {
+  Widget _key(int index, BuildContext context) {
     String text = "";
     Widget child = const SizedBox();
     if (index < 9) {
@@ -109,15 +111,30 @@ class PinKeyboard extends StatelessWidget {
             focusColor: Colors.transparent,
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
-            onPressed: () {
-              if (text == "back") {
-                pinNot.value =
-                    pinNot.value.substring(0, pinNot.value.length - 1);
-              } else {
-                pinNot.value += text;
-              }
-            },
+            onPressed: () => _onPressed(text, context),
             icon: child,
           );
+  }
+
+  void _onPressed(String text, BuildContext context) {
+    if (text == "back") {
+      pinNot.value = pinNot.value.substring(0, pinNot.value.length - 1);
+    } else {
+      pinNot.value += text;
+      if (pinNot.value.length == 4) {
+        if (pinNot.value == Prefs().pin) {
+          Prefs().setPin(pinNot.value);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const AccountsPage()),
+              (route) => false);
+        } else {
+          pinNot.value = "";
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Invalid PIN")),
+          );
+        }
+      }
+    }
   }
 }
