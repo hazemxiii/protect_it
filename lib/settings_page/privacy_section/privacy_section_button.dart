@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PrivacySectionButton extends StatefulWidget {
@@ -43,7 +44,7 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
                 )),
             const Spacer(),
             (_value == null || _loading)
-                ? const Icon(Icons.question_mark, color: Colors.grey)
+                ? const LoadingWidget()
                 : _value == false
                     ? const Icon(Icons.cancel, color: Colors.red)
                     : const Icon(Icons.check_circle, color: Colors.green),
@@ -69,5 +70,16 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
     }
     _loading = false;
     setState(() {});
+  }
+}
+
+class LoadingWidget extends StatelessWidget {
+  const LoadingWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const CupertinoActivityIndicator(
+      color: Colors.black,
+    );
   }
 }
