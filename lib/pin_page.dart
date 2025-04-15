@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/accounts_page.dart';
-import 'package:protect_it/service/prefs.dart';
 
 class PinPage extends StatelessWidget {
-  const PinPage({super.key});
+  final Function(ValueNotifier<String>, BuildContext, {String? pin}) onSubmit;
+  final String title;
+  final String? pin;
+  const PinPage(
+      {super.key, required this.onSubmit, required this.title, this.pin});
 
   @override
   Widget build(BuildContext context) {
     ValueNotifier<String> pinNot = ValueNotifier("");
-    // TODO: submit pin
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -16,13 +17,14 @@ class PinPage extends StatelessWidget {
           spacing: 20,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(title, style: const TextStyle(fontSize: 20)),
             ValueListenableBuilder(
               valueListenable: pinNot,
               builder: (context, value, child) {
                 return PinInput(pin: value);
               },
             ),
-            PinKeyboard(pinNot: pinNot),
+            PinKeyboard(pinNot: pinNot, onSubmit: onSubmit, pin: pin),
           ],
         ),
       ),
@@ -64,10 +66,12 @@ class PinInput extends StatelessWidget {
 }
 
 class PinKeyboard extends StatelessWidget {
-  const PinKeyboard({super.key, required this.pinNot});
+  const PinKeyboard(
+      {super.key, required this.pinNot, required this.onSubmit, this.pin});
 
   final ValueNotifier<String> pinNot;
-
+  final Function(ValueNotifier<String>, BuildContext, {String? pin}) onSubmit;
+  final String? pin;
   final TextStyle textStyle = const TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
@@ -111,29 +115,18 @@ class PinKeyboard extends StatelessWidget {
             focusColor: Colors.transparent,
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
-            onPressed: () => _onPressed(text, context),
+            onPressed: () => _onType(text, context),
             icon: child,
           );
   }
 
-  void _onPressed(String text, BuildContext context) {
+  void _onType(String text, BuildContext context) {
     if (text == "back") {
       pinNot.value = pinNot.value.substring(0, pinNot.value.length - 1);
     } else {
       pinNot.value += text;
       if (pinNot.value.length == 4) {
-        if (pinNot.value == Prefs().pin) {
-          Prefs().setPin(pinNot.value);
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const AccountsPage()),
-              (route) => false);
-        } else {
-          pinNot.value = "";
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Invalid PIN")),
-          );
-        }
+        onSubmit(pinNot, context, pin: pin);
       }
     }
   }

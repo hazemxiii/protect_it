@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/service/backend.dart';
-import 'package:protect_it/service/prefs.dart';
 
 class PrivacySectionButton extends StatefulWidget {
   final String text;
-  final bool isOtp;
-  final Future<String?> Function(bool) onPressed;
+  final Future<bool> Function() getValue;
+  final Future<bool?> Function(bool) onPressed;
   const PrivacySectionButton(
       {super.key,
       required this.text,
-      required this.isOtp,
+      required this.getValue,
       required this.onPressed});
 
   @override
@@ -17,7 +15,18 @@ class PrivacySectionButton extends StatefulWidget {
 }
 
 class _PrivacySectionButtonState extends State<PrivacySectionButton> {
-  bool _value = false;
+  @override
+  void initState() {
+    super.initState();
+    widget.getValue().then((value) {
+      setState(() {
+        _value = value;
+      });
+    });
+  }
+
+  bool? _value;
+  bool _loading = false;
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
@@ -25,7 +34,7 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         color: Colors.white,
         textColor: Colors.black,
-        onPressed: () => _onPressed(!_value),
+        onPressed: () => _onPressed(_value),
         child: Row(
           children: [
             Text(widget.text,
@@ -33,35 +42,32 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
                   fontSize: 16,
                 )),
             const Spacer(),
-            SizedBox(
-              height: 20,
-              child: FutureBuilder<bool>(
-                  future: widget.isOtp
-                      ? Backend().otpEnabled
-                      : Future.value(Prefs().isBioActive),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      _value = snapshot.data!;
-                      return _value
-                          ? const Icon(Icons.check_circle, color: Colors.green)
-                          : const Icon(Icons.cancel, color: Colors.red);
-                    }
-                    return const CircularProgressIndicator(color: Colors.black);
-                  }),
-            ),
+            (_value == null || _loading)
+                ? const Icon(Icons.question_mark, color: Colors.grey)
+                : _value == false
+                    ? const Icon(Icons.cancel, color: Colors.red)
+                    : const Icon(Icons.check_circle, color: Colors.green),
           ],
         ));
   }
 
-  void _onPressed(bool v) async {
-    String? b = await widget.onPressed(v);
+  void _onPressed(bool? oldValue) async {
+    if (oldValue == null) {
+      return;
+    }
+    setState(() {
+      _loading = true;
+    });
+    bool? b = await widget.onPressed(!oldValue);
     if (b == null) {
-      setState(() {});
-    } else {
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Failed to Updated")));
       }
+    } else {
+      _value = b;
     }
+    _loading = false;
+    setState(() {});
   }
 }
