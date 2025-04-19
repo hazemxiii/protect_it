@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:protect_it/models/account.dart';
@@ -15,7 +16,7 @@ class Backend {
 
   Future<Response> _makeRequest(String path,
       {Map<String, dynamic>? data, bool authorized = true}) async {
-    bool secure = true;
+    bool secure = kReleaseMode;
     // ignore: dead_code
     String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
     data ??= {};

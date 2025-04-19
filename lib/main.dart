@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:protect_it/accounts_page.dart';
+import 'package:protect_it/accounts_page/accounts_page.dart';
 import 'package:protect_it/pin_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/bio.dart';
@@ -51,7 +51,8 @@ class _AppState extends State<App> {
     Widget child = const SignInPage();
     if (Prefs().isLoggedIn) {
       if (Prefs().pin != null) {
-        child = const PinPage();
+        child = PinPage(
+            onSubmit: _onPinSubmit, title: "Enter Pin to continue", pin: null);
       } else {
         child = const AccountsPage();
       }
@@ -66,6 +67,21 @@ class _AppState extends State<App> {
         home: child,
       ),
     );
+  }
+
+  void _onPinSubmit(ValueNotifier<String> pinNot, BuildContext context,
+      {String? pin}) {
+    if (pinNot.value == Prefs().pin) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const AccountsPage()),
+          (route) => false);
+    } else {
+      pinNot.value = "";
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid PIN")),
+      );
+    }
   }
 }
 

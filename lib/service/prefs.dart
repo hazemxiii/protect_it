@@ -56,8 +56,12 @@ class Prefs {
     _prefs.setBool(_bio, v);
   }
 
-  void setPin(String pin) {
-    _prefs.setString(_pin, pin);
+  void setPin(String? pin) {
+    if (pin == null) {
+      _prefs.remove(_pin);
+    } else {
+      _prefs.setString(_pin, pin);
+    }
   }
 
   void setDontShowAgain(bool v) {
