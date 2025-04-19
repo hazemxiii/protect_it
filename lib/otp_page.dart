@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:protect_it/accounts_page.dart';
+import 'package:protect_it/accounts_page/accounts_page.dart';
 import 'package:protect_it/service/backend.dart';
 
 class OtpPage extends StatefulWidget {

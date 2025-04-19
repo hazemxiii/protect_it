@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:protect_it/accounts_page.dart';
+import 'package:protect_it/accounts_page/accounts_page.dart';
 import 'package:protect_it/otp_page.dart';
 import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/sign_up_page.dart';
