@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:protect_it/accounts_page/accounts_page.dart';
 import 'package:protect_it/pin_page.dart';
@@ -25,16 +23,14 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   bool _loading = true;
+  bool _bioFailed = false;
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (Prefs().isLoggedIn) {
         if (Prefs().isBioActive) {
-          bool b = await Bio().authenticate();
-          if (!b) {
-            exit(0);
-          }
+          _bioFailed = !(await Bio().authenticate());
         }
       }
       if (mounted) {
@@ -48,9 +44,19 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => AccountNotifier(),
+      child: MaterialApp(
+        scaffoldMessengerKey: Backend().scaffoldMessengerKey,
+        home: _buildChild(),
+      ),
+    );
+  }
+
+  Widget _buildChild() {
     Widget child = const SignInPage();
     if (Prefs().isLoggedIn) {
-      if (Prefs().pin != null) {
+      if (Prefs().pin != null && _bioFailed) {
         child = PinPage(
             onSubmit: _onPinSubmit, title: "Enter Pin to continue", pin: null);
       } else {
@@ -60,13 +66,7 @@ class _AppState extends State<App> {
     if (_loading) {
       child = const LoadingPage();
     }
-    return ChangeNotifierProvider(
-      create: (context) => AccountNotifier(),
-      child: MaterialApp(
-        scaffoldMessengerKey: Backend().scaffoldMessengerKey,
-        home: child,
-      ),
-    );
+    return child;
   }
 
   void _onPinSubmit(ValueNotifier<String> pinNot, BuildContext context,
@@ -82,6 +82,19 @@ class _AppState extends State<App> {
         const SnackBar(content: Text("Invalid PIN")),
       );
     }
+  }
+}
+
+class BioFailedPage extends StatelessWidget {
+  const BioFailedPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text("Biometric Authentication Failed"),
+      ),
+    );
   }
 }
 

@@ -49,20 +49,16 @@ class _AccountWidgetState extends State<AccountWidget> {
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AccountAttributeWidget(
-                  attribute: widget.account.mainAttr,
-                  color: widget.account.color,
-                  name: widget.account.mainKey),
-              if (widget.account.secAttr != null)
-                AccountAttributeWidget(
-                    attribute: widget.account.secAttr!,
-                    color: widget.account.color,
-                    name: widget.account.secKey),
-            ],
-          ),
+          AccountAttributeWidget(
+              attribute: widget.account.mainAttr,
+              color: widget.account.color,
+              name: widget.account.mainKey),
+          if (widget.account.secAttr != null)
+            AccountAttributeWidget(
+                attribute: widget.account.secAttr!,
+                color: widget.account.color,
+                name: widget.account.secKey),
+          const Spacer(),
           InkWell(
               onTap: _openDetails,
               child: Row(
@@ -142,7 +138,7 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
             ],
           ),
         ),
-        const Spacer(),
+        // const Spacer(),
         if (widget.attribute.isSensitive)
           InkWell(
             onTap: () => setState(() => isHidden = !isHidden),

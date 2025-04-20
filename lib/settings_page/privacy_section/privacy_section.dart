@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/pin_page.dart';
 import 'package:protect_it/service/backend.dart';
+import 'package:protect_it/service/bio.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/settings_page/privacy_section/privacy_section_button.dart';
 import 'package:protect_it/settings_page/settings_page.dart';
@@ -21,13 +22,20 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
             PrivacySectionButton(
                 getValue: _getOtp, onPressed: (v) => _setOtp(v), text: "OTP"),
             PrivacySectionButton(
-                getValue: () => Future.value(Prefs().isBioActive),
-                text: "Biometric",
-                onPressed: (v) => _setBiometric(v)),
-            PrivacySectionButton(
                 getValue: () => Future.value(Prefs().pin != null),
                 text: "Pin",
                 onPressed: (v) => _setPin(v)),
+            FutureBuilder(
+                future: Bio().bioIsAvailable(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data == true) {
+                    return PrivacySectionButton(
+                        getValue: _getBiometric,
+                        text: "Biometric",
+                        onPressed: (v) => _setBiometric(v));
+                  }
+                  return const SizedBox.shrink();
+                }),
           ],
         ),
         title: "Privacy Settings",
@@ -36,6 +44,13 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
 
   Future<bool> _getOtp() async {
     return await Backend().otpEnabled;
+  }
+
+  Future<bool> _getBiometric() async {
+    if (await Bio().bioIsNotEmpty()) {
+      return Prefs().isBioActive;
+    }
+    return false;
   }
 
   Future<bool?> _setOtp(bool v) async {
@@ -47,6 +62,12 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
   }
 
   Future<bool?> _setBiometric(bool v) async {
+    if (Prefs().pin == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please set a pin first")),
+      );
+      return null;
+    }
     Prefs().setBio(v);
     return Prefs().isBioActive;
   }
