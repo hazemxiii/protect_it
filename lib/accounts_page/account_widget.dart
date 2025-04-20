@@ -109,6 +109,14 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
     isHidden = widget.attribute.isSensitive;
   }
 
+  @override
+  void didUpdateWidget(AccountAttributeWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.attribute != widget.attribute) {
+      isHidden = widget.attribute.isSensitive;
+    }
+  }
+
   bool isHidden = false;
   @override
   Widget build(BuildContext context) {
