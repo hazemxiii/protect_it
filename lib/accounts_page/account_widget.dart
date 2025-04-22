@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/account_details/account_details.dart';
+import 'package:protect_it/account_details/attribute_custom_widgets.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/models/attribute.dart';
 import 'package:protect_it/service/account_notifier.dart';
@@ -50,11 +51,13 @@ class _AccountWidgetState extends State<AccountWidget> {
             ],
           ),
           AccountAttributeWidget(
+              account: widget.account,
               attribute: widget.account.mainAttr,
               color: widget.account.color,
               name: widget.account.mainKey),
           if (widget.account.secAttr != null)
             AccountAttributeWidget(
+                account: widget.account,
                 attribute: widget.account.secAttr!,
                 color: widget.account.color,
                 name: widget.account.secKey),
@@ -88,11 +91,15 @@ class AccountAttributeWidget extends StatefulWidget {
   final Attribute attribute;
   final String name;
   final Color color;
+  final bool showContextMenu;
+  final Account account;
   const AccountAttributeWidget(
       {super.key,
       required this.attribute,
       required this.name,
-      required this.color});
+      required this.color,
+      required this.account,
+      this.showContextMenu = false});
 
   @override
   State<AccountAttributeWidget> createState() => _AccountAttributeWidgetState();
@@ -139,6 +146,7 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
           ),
         ),
         // const Spacer(),
+        if (widget.showContextMenu) _contextMenu(),
         if (widget.attribute.isSensitive)
           InkWell(
             onTap: () => setState(() => isHidden = !isHidden),
@@ -152,5 +160,88 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
             child: const Icon(Icons.copy_rounded, size: 17)),
       ],
     );
+  }
+
+  Widget _contextMenu() {
+    return PopupMenuButton(
+      onSelected: _onContextMenu,
+      itemBuilder: (_) {
+        return const [
+          PopupMenuItem(
+            value: "main",
+            child: Icon(Icons.label_important_outline),
+          ),
+          PopupMenuItem(
+            value: "secondary",
+            child: Icon(Icons.label_outline),
+          ),
+          PopupMenuItem(
+            value: "edit",
+            child: Icon(Icons.edit_rounded),
+          ),
+          PopupMenuItem(
+            value: "sensetive",
+            child: Icon(Icons.visibility_outlined),
+          ),
+          PopupMenuItem(
+            value: "delete",
+            child: Icon(Icons.delete_rounded),
+          ),
+        ];
+      },
+    );
+  }
+
+  void _onContextMenu(String value) {
+    if (value == "edit") {
+      _showEditDialog();
+    } else if (value == "delete") {
+      _deleteAttribute();
+    } else if (value == "main") {
+      _checkButtonClick(true, widget.account, widget.name);
+    } else if (value == "secondary") {
+      _checkButtonClick(false, widget.account, widget.name);
+    } else if (value == "sensetive") {
+      Provider.of<AccountNotifier>(
+        context,
+        listen: false,
+      ).setSensitive(
+          widget.account, widget.attribute, !widget.attribute.isSensitive);
+    }
+  }
+
+  void _checkButtonClick(bool isMain, Account account, String key) {
+    if (isMain) {
+      Provider.of<AccountNotifier>(context, listen: false)
+          .setMain(widget.account, widget.name);
+    } else {
+      Provider.of<AccountNotifier>(context, listen: false)
+          .setSec(widget.account, widget.name);
+    }
+  }
+
+  void _showEditDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => EditAttributeWidget(
+            attr: widget.attribute,
+            account: widget.account,
+            attrKey: widget.name));
+  }
+
+  void _deleteAttribute() {
+    if (Provider.of<AccountNotifier>(context, listen: false)
+        .deleteAttribute(widget.account, widget.name)) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            duration: const Duration(seconds: 10),
+            backgroundColor:
+                Color.lerp(Colors.white, widget.account.color, 0.1),
+            content: UndoWidget(
+              color: widget.account.color,
+            )),
+      );
+    }
   }
 }

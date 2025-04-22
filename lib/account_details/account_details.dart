@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/account_details/attribute_custom_widgets.dart';
-import 'package:protect_it/account_details/attribute_details.dart';
+import 'package:protect_it/accounts_page/account_widget.dart';
 import 'package:protect_it/accounts_page/accounts_page.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/models/attribute.dart';
@@ -43,15 +43,15 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
       appBar: AppBar(
         title: TextField(
           onChanged: _onType,
-          cursorColor: Colors.white,
+          cursorColor: Colors.black,
           decoration: const InputDecoration(border: InputBorder.none),
           style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
           controller: accountNameCont,
         ),
-        backgroundColor: widget.account.color,
-        foregroundColor: Colors.white,
+        backgroundColor: Color.lerp(widget.account.color, Colors.white, 0.9),
+        foregroundColor: Colors.black,
         centerTitle: true,
         actions: [
           _button(Icons.add, _showEditDialog),
@@ -63,6 +63,8 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _section(true),
+            _section(false),
             const SizedBox(
               height: 5,
             ),
@@ -77,27 +79,27 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              height: MediaQuery.of(context).size.height - 105,
-              child: GridView(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    mainAxisExtent: 250,
-                    maxCrossAxisExtent: 320),
-                children: [
-                  ...widget.account.attributes.entries.map((e) {
-                    return AttributeWidget(
-                      account: widget.account,
-                      type: _getType(e.key),
-                      attr: e.value,
-                      attributeKey: e.key,
-                    );
-                  })
-                ],
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.all(10),
+            //   height: MediaQuery.of(context).size.height - 105,
+            //   child: GridView(
+            //     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            //         crossAxisSpacing: 10,
+            //         mainAxisSpacing: 10,
+            //         mainAxisExtent: 250,
+            //         maxCrossAxisExtent: 320),
+            //     children: [
+            //       ...widget.account.attributes.entries.map((e) {
+            //         return AttributeWidget(
+            //           account: widget.account,
+            //           type: _getType(e.key),
+            //           attr: e.value,
+            //           attributeKey: e.key,
+            //         );
+            //       })
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -129,7 +131,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
 
   IconButton _button(IconData icon, VoidCallback function) {
     return IconButton(
-        color: Colors.white, onPressed: function, icon: Icon(icon));
+        color: Colors.black, onPressed: function, icon: Icon(icon));
   }
 
   void _showDeleteDialog() {
@@ -169,9 +171,10 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
       child: Container(
         height: 30,
         width: 30,
+        // margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
             border: const Border.fromBorderSide(
-                BorderSide(width: 3, color: Colors.white)),
+                BorderSide(width: 3, color: Colors.black)),
             color: widget.account.color,
             borderRadius: const BorderRadius.all(Radius.circular(999))),
       ),
@@ -200,6 +203,68 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
       return AttributeType.secondary;
     }
     return AttributeType.normal;
+  }
+
+// TODO: color widget
+// TODO: context menu design
+  Widget _section(bool isMain) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            spacing: 5,
+            children: [
+              if (isMain) _colorButton(),
+              Text(isMain ? widget.account.name : "Additional Details",
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black)),
+            ],
+          ),
+          Text(isMain ? "Main Details" : "Additional Details"),
+          SingleChildScrollView(
+              child: Column(
+                  spacing: isMain ? 20 : 5,
+                  children: _getAttributes(isMain)
+                      .entries
+                      .map((e) => AccountAttributeWidget(
+                            account: widget.account,
+                            attribute: e.value,
+                            name: e.key,
+                            color: widget.account.color,
+                            showContextMenu: true,
+                          ))
+                      .toList()))
+        ],
+      ),
+    );
+  }
+
+  Map<String, Attribute> _getAttributes(bool isMain) {
+    Map<String, Attribute> attributes = {};
+    if (isMain) {
+      attributes[widget.account.mainKey] = widget.account.mainAttr;
+      if (widget.account.secAttr != null) {
+        attributes[widget.account.secKey] = widget.account.secAttr!;
+      }
+      return attributes;
+    }
+    for (var e in widget.account.attributes.entries) {
+      AttributeType type = _getType(e.key);
+      if (type == AttributeType.normal) {
+        attributes[e.key] = e.value;
+      }
+    }
+    return attributes;
   }
 }
 
