@@ -75,10 +75,10 @@ class Backend {
     final r = await _makeRequest("/login",
         data: {"username": username, "password": password, "otp": otp},
         authorized: false);
-    debugPrint(r.data.toString());
     if (r.ok) {
       if ((r.data as Map<String, dynamic>).containsKey('access_token')) {
-        Prefs().login(username, password, r.data['access_token']);
+        Prefs().login(username, password, r.data['access_token'],
+            DateTime.now().add(Duration(seconds: r.data['expires_in'])));
         return null;
       }
       _otpEnabled = r.data['otpEnabled'];

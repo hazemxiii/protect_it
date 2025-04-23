@@ -11,6 +11,7 @@ class Prefs {
   static const String _cache = "cache";
   static const String _bio = "bio";
   static const String _pin = "pin";
+  static const String _expiresOn = "expiresOn";
 
   Prefs._();
 
@@ -46,10 +47,12 @@ class Prefs {
     return _prefs.getBool(_dontShowAgain) ?? false;
   }
 
-  void login(String username, String password, String token) {
+  void login(
+      String username, String password, String token, DateTime expireOn) {
     _prefs.setString(_username, username);
     _prefs.setString(_password, password);
     _prefs.setString(_accessToken, token);
+    _prefs.setString(_expiresOn, expireOn.toIso8601String());
   }
 
   void setBio(bool v) {
@@ -86,10 +89,21 @@ class Prefs {
     return _prefs.getStringList(_cache) ?? [];
   }
 
-  bool get isLoggedIn =>
-      _prefs.getString(_username) != null &&
-      _prefs.getString(_password) != null &&
-      _prefs.getString(_accessToken) != null;
+  void setExpireOn(DateTime expireOn) {
+    _prefs.setString(_expiresOn, expireOn.toIso8601String());
+  }
+
+  bool get isLoggedIn {
+    String? expDate = _prefs.getString(_expiresOn);
+
+    if (expDate == null) return false;
+    DateTime expireOn = DateTime.parse(expDate);
+    if (expireOn.isBefore(DateTime.now())) return false;
+
+    return _prefs.getString(_username) != null &&
+        _prefs.getString(_password) != null &&
+        _prefs.getString(_accessToken) != null;
+  }
 
   void setUsername(String username) {
     _prefs.setString(_username, username);
