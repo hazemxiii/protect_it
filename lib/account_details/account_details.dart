@@ -41,22 +41,12 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     return Scaffold(
       backgroundColor: Color.lerp(widget.account.color, Colors.white, 0.9),
       appBar: AppBar(
-        title: TextField(
-          onChanged: _onType,
-          cursorColor: Colors.black,
-          decoration: const InputDecoration(border: InputBorder.none),
-          style:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-          controller: accountNameCont,
-        ),
         backgroundColor: Color.lerp(widget.account.color, Colors.white, 0.9),
         foregroundColor: Colors.black,
         centerTitle: true,
         actions: [
           _button(Icons.add, _showEditDialog),
           _button(Icons.delete_outline_rounded, _showDeleteDialog),
-          _colorButton()
         ],
       ),
       body: SingleChildScrollView(
@@ -71,35 +61,24 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
             Container(
               margin: const EdgeInsets.only(left: 10),
               child: MaterialButton(
-                color: widget.account.color,
+                padding: const EdgeInsets.all(15),
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
                 onPressed: _cancel,
-                child: const Text(
-                  "Cancel",
-                  style: TextStyle(color: Colors.white),
+                child: const Row(
+                  spacing: 10,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.cancel_outlined, color: Colors.black),
+                    Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
                 ),
               ),
             ),
-            // Container(
-            //   padding: const EdgeInsets.all(10),
-            //   height: MediaQuery.of(context).size.height - 105,
-            //   child: GridView(
-            //     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            //         crossAxisSpacing: 10,
-            //         mainAxisSpacing: 10,
-            //         mainAxisExtent: 250,
-            //         maxCrossAxisExtent: 320),
-            //     children: [
-            //       ...widget.account.attributes.entries.map((e) {
-            //         return AttributeWidget(
-            //           account: widget.account,
-            //           type: _getType(e.key),
-            //           attr: e.value,
-            //           attributeKey: e.key,
-            //         );
-            //       })
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -169,8 +148,8 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     return InkWell(
       onTap: _showColorPicker,
       child: Container(
-        height: 30,
-        width: 30,
+        height: 20,
+        width: 20,
         // margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
             border: const Border.fromBorderSide(
@@ -205,8 +184,6 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     return AttributeType.normal;
   }
 
-// TODO: color widget
-// TODO: context menu design
   Widget _section(bool isMain) {
     return Container(
       padding: const EdgeInsets.all(10),
@@ -223,30 +200,51 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
             spacing: 5,
             children: [
               if (isMain) _colorButton(),
-              Text(isMain ? widget.account.name : "Additional Details",
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black)),
+              _sectionNameWidget(isMain),
             ],
           ),
           Text(isMain ? "Main Details" : "Additional Details"),
-          SingleChildScrollView(
-              child: Column(
-                  spacing: isMain ? 20 : 5,
-                  children: _getAttributes(isMain)
-                      .entries
-                      .map((e) => AccountAttributeWidget(
-                            account: widget.account,
-                            attribute: e.value,
-                            name: e.key,
-                            color: widget.account.color,
-                            showContextMenu: true,
-                          ))
-                      .toList()))
+          _buildSectionChildren(isMain)
         ],
       ),
     );
+  }
+
+  Widget _sectionNameWidget(bool isMain) {
+    const style = TextStyle(
+        fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black);
+    var hintColor = Color.lerp(widget.account.color, Colors.white, 0.5);
+    if (isMain) {
+      return Expanded(
+        child: TextField(
+          cursorColor: widget.account.color,
+          onChanged: _onType,
+          controller: accountNameCont,
+          style: style,
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "Account Name",
+              hintStyle: TextStyle(color: hintColor)),
+        ),
+      );
+    }
+    return const Text("Additional Details", style: style);
+  }
+
+  Widget _buildSectionChildren(bool isMain) {
+    return SingleChildScrollView(
+        child: Column(
+            spacing: isMain ? 20 : 5,
+            children: _getAttributes(isMain)
+                .entries
+                .map((e) => AccountAttributeWidget(
+                      account: widget.account,
+                      attribute: e.value,
+                      name: e.key,
+                      color: widget.account.color,
+                      showContextMenu: true,
+                    ))
+                .toList()));
   }
 
   Map<String, Attribute> _getAttributes(bool isMain) {

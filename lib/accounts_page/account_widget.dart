@@ -164,31 +164,31 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
 
   Widget _contextMenu() {
     return PopupMenuButton(
+      color: Color.lerp(Colors.white, widget.account.color, 0.1),
       onSelected: _onContextMenu,
       itemBuilder: (_) {
-        return const [
-          PopupMenuItem(
-            value: "main",
-            child: Icon(Icons.label_important_outline),
-          ),
-          PopupMenuItem(
-            value: "secondary",
-            child: Icon(Icons.label_outline),
-          ),
-          PopupMenuItem(
-            value: "edit",
-            child: Icon(Icons.edit_rounded),
-          ),
-          PopupMenuItem(
-            value: "sensetive",
-            child: Icon(Icons.visibility_outlined),
-          ),
-          PopupMenuItem(
-            value: "delete",
-            child: Icon(Icons.delete_rounded),
-          ),
+        return [
+          _menuItem(Icons.label_important_outline, "Set As Main", "main"),
+          _menuItem(Icons.label_outline, "Set As Secondary", "secondary"),
+          _menuItem(Icons.edit_rounded, "Edit", "edit"),
+          _menuItem(
+              Icons.visibility_outlined, "Toggle Sensitivity", "sensetive"),
+          _menuItem(Icons.delete_rounded, "Delete", "delete"),
         ];
       },
+    );
+  }
+
+  PopupMenuItem<String> _menuItem(IconData icon, String text, String value) {
+    return PopupMenuItem(
+      value: value,
+      child: Row(
+        spacing: 5,
+        children: [
+          Icon(icon),
+          Text(text),
+        ],
+      ),
     );
   }
 
@@ -202,6 +202,7 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
     } else if (value == "secondary") {
       _checkButtonClick(false, widget.account, widget.name);
     } else if (value == "sensetive") {
+      isHidden = false;
       Provider.of<AccountNotifier>(
         context,
         listen: false,
