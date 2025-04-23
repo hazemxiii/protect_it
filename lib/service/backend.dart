@@ -48,6 +48,17 @@ class Backend {
     debugPrint(r.data.toString());
   }
 
+  Future<bool?> isLoggedIn() async {
+    final r = await _makeRequest("/");
+    if (r.ok) {
+      if (r.data['error']) {
+        return null;
+      }
+      return r.data['loggedIn'];
+    }
+    return null;
+  }
+
   Future<String?> register(String username, String password) async {
     final r = await _makeRequest("/register",
         data: {"username": username, "password": password}, authorized: false);
