@@ -94,6 +94,11 @@ class Backend {
     return "Unknown Error";
   }
 
+  Future<bool> logout() async {
+    final r = await _makeRequest("/logout");
+    return r.ok;
+  }
+
   Future<List<Account>?> getAccounts() async {
     final r = await _makeRequest("/accounts");
     if (r.ok) {

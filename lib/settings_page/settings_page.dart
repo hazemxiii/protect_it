@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/service/account_notifier.dart';
+import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/settings_page/change_dialog_widget.dart';
 import 'package:protect_it/settings_page/privacy_section/privacy_section.dart';
@@ -81,11 +82,18 @@ class _SettingsPageState extends State<SettingsPage> {
     showDialog(context: context, builder: (_) => const ChangeSecretDialog());
   }
 
-  void _logout() {
-    Provider.of<AccountNotifier>(context, listen: false).logout();
-    Prefs().logout();
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const SignInPage()), (_) => false);
+  void _logout() async {
+    bool r = await Backend().logout();
+    if (!mounted) return;
+    if (r) {
+      Provider.of<AccountNotifier>(context, listen: false).logout();
+      Prefs().logout();
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const SignInPage()), (_) => false);
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Logout Failed")));
+    }
   }
 }
 
