@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:protect_it/models/offline_request.dart';
 import 'package:protect_it/service/random_pass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,6 +15,7 @@ class Prefs {
   static const String _bio = "bio";
   static const String _pin = "pin";
   static const String _expiresOn = "expiresOn";
+  static const String _offlineRequests = "offlineRequests";
 
   Prefs._();
 
@@ -19,6 +23,95 @@ class Prefs {
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
+  }
+
+  void setBio(bool v) {
+    _prefs.setBool(_bio, v);
+  }
+
+  void setPin(String? pin) {
+    if (pin == null) {
+      _prefs.remove(_pin);
+    } else {
+      _prefs.setString(_pin, pin);
+    }
+  }
+
+  void setDontShowAgain(bool v) {
+    _prefs.setBool(_dontShowAgain, v);
+  }
+
+  void setAccessToken(String token) {
+    _prefs.setString(_accessToken, token);
+  }
+
+  void setCache(List<String> cache) {
+    _prefs.setStringList(_cache, cache);
+  }
+
+  void setExpireOn(DateTime expireOn) {
+    _prefs.setString(_expiresOn, expireOn.toIso8601String());
+  }
+
+  void setUsername(String username) {
+    _prefs.setString(_username, username);
+  }
+
+  void setPassword(String password) {
+    _prefs.setString(_password, password);
+  }
+
+  void addOfflineRequest(OfflineRequest request) {
+    _prefs.setStringList(_offlineRequests,
+        [..._prefs.getStringList(_offlineRequests) ?? [], request.toJSON()]);
+  }
+
+  void removeOfflineRequest(OfflineRequest request) {
+    _prefs.setStringList(
+        _offlineRequests,
+        _prefs
+                .getStringList(_offlineRequests)
+                ?.where((e) => e != request.toJSON())
+                .toList() ??
+            []);
+  }
+
+  bool get isBioActive => _prefs.getBool(_bio) ?? false;
+  String? get username => _prefs.getString(_username);
+  String? get pin => _prefs.getString(_pin);
+  String? get password => _prefs.getString(_password);
+  bool get isCached => _prefs.containsKey(_cache);
+
+  List<OfflineRequest> getOfflineRequests() {
+    return _prefs
+            .getStringList(_offlineRequests)
+            ?.map((e) => OfflineRequest.fromJSON(e))
+            .toList() ??
+        [];
+  }
+
+  String getAccessToken() {
+    return _prefs.getString(_accessToken) ?? "";
+  }
+
+  List<String> getCache() {
+    return _prefs.getStringList(_cache) ?? [];
+  }
+
+  bool get isLoggedIn {
+    String? expDate = _prefs.getString(_expiresOn);
+
+    if (expDate == null) return false;
+    DateTime expireOn = DateTime.parse(expDate);
+    if (expireOn.isBefore(DateTime.now())) return false;
+
+    return _prefs.getString(_username) != null &&
+        _prefs.getString(_password) != null &&
+        _prefs.getString(_accessToken) != null;
+  }
+
+  bool getDontShowAgain() {
+    return _prefs.getBool(_dontShowAgain) ?? false;
   }
 
   RandomPass getRandomPass() {
@@ -43,10 +136,6 @@ class Prefs {
     return success;
   }
 
-  bool getDontShowAgain() {
-    return _prefs.getBool(_dontShowAgain) ?? false;
-  }
-
   void login(
       String username, String password, String token, DateTime expireOn) {
     _prefs.setString(_username, username);
@@ -54,71 +143,6 @@ class Prefs {
     _prefs.setString(_accessToken, token);
     _prefs.setString(_expiresOn, expireOn.toIso8601String());
   }
-
-  void setBio(bool v) {
-    _prefs.setBool(_bio, v);
-  }
-
-  void setPin(String? pin) {
-    if (pin == null) {
-      _prefs.remove(_pin);
-    } else {
-      _prefs.setString(_pin, pin);
-    }
-  }
-
-  void setDontShowAgain(bool v) {
-    _prefs.setBool(_dontShowAgain, v);
-  }
-
-  void setAccessToken(String token) {
-    _prefs.setString(_accessToken, token);
-  }
-
-  String getAccessToken() {
-    return _prefs.getString(_accessToken) ?? "";
-  }
-
-  bool get isCached => _prefs.containsKey(_cache);
-
-  void setCache(List<String> cache) {
-    _prefs.setStringList(_cache, cache);
-  }
-
-  List<String> getCache() {
-    return _prefs.getStringList(_cache) ?? [];
-  }
-
-  void setExpireOn(DateTime expireOn) {
-    _prefs.setString(_expiresOn, expireOn.toIso8601String());
-  }
-
-  bool get isLoggedIn {
-    String? expDate = _prefs.getString(_expiresOn);
-
-    if (expDate == null) return false;
-    DateTime expireOn = DateTime.parse(expDate);
-    if (expireOn.isBefore(DateTime.now())) return false;
-
-    return _prefs.getString(_username) != null &&
-        _prefs.getString(_password) != null &&
-        _prefs.getString(_accessToken) != null;
-  }
-
-  void setUsername(String username) {
-    _prefs.setString(_username, username);
-  }
-
-  bool get isBioActive => _prefs.getBool(_bio) ?? false;
-
-  String? get username => _prefs.getString(_username);
-  String? get pin => _prefs.getString(_pin);
-
-  void setPassword(String password) {
-    _prefs.setString(_password, password);
-  }
-
-  String? get password => _prefs.getString(_password);
 
   void logout() {
     _prefs.remove(_accessToken);

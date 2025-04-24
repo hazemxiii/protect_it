@@ -15,7 +15,9 @@ class Backend {
       GlobalKey<ScaffoldMessengerState>();
 
   Future<Response> _makeRequest(String path,
-      {Map<String, dynamic>? data, bool authorized = true}) async {
+      {Map<String, dynamic>? data,
+      bool authorized = true,
+      bool retry = false}) async {
     bool secure = kReleaseMode;
     // ignore: dead_code
     String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
@@ -36,9 +38,15 @@ class Backend {
           _logout();
         }
       }
-      return Response(ok: response.statusCode == 200, data: r);
+      return Response(
+          ok: response.statusCode == 200,
+          data: r,
+          statusCode: response.statusCode);
     } catch (e) {
-      return Response(ok: false, data: e.toString());
+      if (retry) {
+        // TODO: save in prefs
+      }
+      return Response(ok: false, data: e.toString(), statusCode: 500);
     }
   }
 
@@ -47,6 +55,8 @@ class Backend {
     debugPrint(r.ok ? "Success" : "Fail");
     debugPrint(r.data.toString());
   }
+
+  void sendOfflineRequest() async {}
 
   Future<bool?> isLoggedIn() async {
     final r = await _makeRequest("/");
@@ -133,6 +143,7 @@ class Backend {
 
   Future<Response> deleteAccount(String id) async {
     final r = await _makeRequest("/accounts/delete", data: {"id": id});
+    if (r.statusCode == 500) {}
     return r;
   }
 
@@ -165,6 +176,7 @@ class Backend {
 class Response {
   bool ok;
   dynamic data;
+  int statusCode;
 
-  Response({required this.ok, required this.data});
+  Response({required this.ok, required this.data, required this.statusCode});
 }
