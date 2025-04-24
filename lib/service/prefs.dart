@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:protect_it/models/offline_request.dart';
 import 'package:protect_it/service/random_pass.dart';
 import 'package:shared_preferences/shared_preferences.dart';

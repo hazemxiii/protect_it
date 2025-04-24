@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:protect_it/models/account.dart';
+import 'package:protect_it/models/offline_request.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/widgets/logout_snackbar.dart';
 
@@ -17,7 +18,7 @@ class Backend {
   Future<Response> _makeRequest(String path,
       {Map<String, dynamic>? data,
       bool authorized = true,
-      bool retry = false}) async {
+      String? requestType}) async {
     bool secure = kReleaseMode;
     // ignore: dead_code
     String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
@@ -43,8 +44,9 @@ class Backend {
           data: r,
           statusCode: response.statusCode);
     } catch (e) {
-      if (retry) {
-        // TODO: save in prefs
+      if (requestType != null) {
+        Prefs().addOfflineRequest(
+            OfflineRequest(data: jsonEncode(data), requestType: requestType));
       }
       return Response(ok: false, data: e.toString(), statusCode: 500);
     }
@@ -126,6 +128,21 @@ class Backend {
     return [];
   }
 
+  Future<void> sendOfflineRequests() async {
+    List<OfflineRequest> requests = Prefs().getOfflineRequests();
+    for (OfflineRequest request in requests) {
+      String resource =
+          request.requestType == "set" ? "/accounts/set" : "/accounts/delete";
+      Response r = await _makeRequest(
+        resource,
+        data: jsonDecode(request.data),
+      );
+      if (r.ok) {
+        Prefs().removeOfflineRequest(request);
+      }
+    }
+  }
+
   Future<bool?> setOtp(bool otp) async {
     final r = await _makeRequest("/otp/set", data: {"otp": otp});
     if (r.ok) {
@@ -137,12 +154,14 @@ class Backend {
 
   Future<Response> setAccount(Account account) async {
     final r = await _makeRequest("/accounts/set",
+        requestType: "set",
         data: {"account": account.toJSON(), "id": account.id});
     return r;
   }
 
   Future<Response> deleteAccount(String id) async {
-    final r = await _makeRequest("/accounts/delete", data: {"id": id});
+    final r = await _makeRequest("/accounts/delete",
+        requestType: "delete", data: {"id": id});
     if (r.statusCode == 500) {}
     return r;
   }
