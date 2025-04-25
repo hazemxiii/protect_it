@@ -22,6 +22,7 @@ class AccountNotifier extends ChangeNotifier {
     if ((accounts).isNotEmpty) _accounts = accounts;
     _loading = false;
     dataUpdated();
+    // await reEncrypt();
     return true;
   }
 
@@ -155,6 +156,15 @@ class AccountNotifier extends ChangeNotifier {
     Response r = await Backend().deleteAccount(account.id);
     if (!r.ok) {}
     // writeUpdate();
+  }
+
+  Future<void> reEncrypt() async {
+    // TODO: invoke
+    for (Account a in _accounts) {
+      print("reEncrypting ${a.name}");
+      await updateName(a, a.name);
+    }
+    dataUpdated();
   }
 
   Map<String, Attribute> addAttribute(Account account) {

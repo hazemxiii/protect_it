@@ -14,6 +14,7 @@ class Prefs {
   static const String _pin = "pin";
   static const String _expiresOn = "expiresOn";
   static const String _offlineRequests = "offlineRequests";
+  static const String _key = "key";
 
   Prefs._();
 
@@ -41,6 +42,10 @@ class Prefs {
 
   void setAccessToken(String token) {
     _prefs.setString(_accessToken, token);
+  }
+
+  void setKey(String key) {
+    _prefs.setString(_key, key);
   }
 
   void setCache(List<String> cache) {
@@ -78,6 +83,7 @@ class Prefs {
   String? get username => _prefs.getString(_username);
   String? get pin => _prefs.getString(_pin);
   String? get password => _prefs.getString(_password);
+  String? get key => _prefs.getString(_key);
   bool get isCached => _prefs.containsKey(_cache);
 
   List<OfflineRequest> getOfflineRequests() {
@@ -134,12 +140,13 @@ class Prefs {
     return success;
   }
 
-  void login(
-      String username, String password, String token, DateTime expireOn) {
+  void login(String username, String password, String token, DateTime expireOn,
+      String key) {
     _prefs.setString(_username, username);
     _prefs.setString(_password, password);
     _prefs.setString(_accessToken, token);
     _prefs.setString(_expiresOn, expireOn.toIso8601String());
+    _prefs.setString(_key, key);
   }
 
   void logout() {

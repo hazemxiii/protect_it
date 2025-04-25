@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/models/offline_request.dart';
+import 'package:protect_it/service/encryption.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:protect_it/widgets/logout_snackbar.dart';
 
@@ -89,8 +90,22 @@ class Backend {
         authorized: false);
     if (r.ok) {
       if ((r.data as Map<String, dynamic>).containsKey('access_token')) {
-        Prefs().login(username, password, r.data['access_token'],
-            DateTime.now().add(Duration(seconds: r.data['expires_in'])));
+        Map<String, dynamic> key = r.data['key'];
+
+        String? decryptedKey = await Encryption().decryptKey(
+            encryptedKeyString: key['encrypted_key'],
+            password: password,
+            saltString: key['salt'],
+            ivString: key['iv']);
+        if (decryptedKey == null) {
+          return "Unknown Error";
+        }
+        Prefs().login(
+            username,
+            password,
+            r.data['access_token'],
+            DateTime.now().add(Duration(seconds: r.data['expires_in'])),
+            decryptedKey);
         return null;
       }
       _otpEnabled = r.data['otpEnabled'];
@@ -104,6 +119,18 @@ class Backend {
       return message;
     }
     return "Unknown Error";
+  }
+
+  Future<String?> changePassword(String oldPassword, String newPassword) async {
+    /// Returns null if success, error message if not
+    final r = await _makeRequest("/change_password",
+        data: {"old_password": oldPassword, "new_password": newPassword});
+    if (r.ok) {
+      return null;
+    } else if (r.statusCode == 500) {
+      return "Unknown Error";
+    }
+    return r.data['message'];
   }
 
   Future<bool> logout() async {

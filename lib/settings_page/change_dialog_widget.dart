@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/service/encryption.dart';
 
 class ChangeSecretDialog extends StatefulWidget {
@@ -30,9 +31,9 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _input(_oldController, _oldValidator, "Old Key"),
-              _input(_newController, _newValidator, "New Key"),
-              _input(_confirmController, _newValidator, "Confirm New Key")
+              _input(_oldController, _oldValidator, "Old Password"),
+              _input(_newController, _newValidator, "New Password"),
+              _input(_confirmController, _newValidator, "Confirm New Password")
             ],
           ),
         ),
@@ -44,12 +45,12 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
               "Cancel",
               style: TextStyle(color: Colors.white),
             )),
-        // TextButton(
-        //     onPressed: _onSubmit,
-        //     child: const Text(
-        //       "Change",
-        //       style: TextStyle(color: Colors.white),
-        //     ))
+        TextButton(
+            onPressed: _onSubmit,
+            child: const Text(
+              "Change",
+              style: TextStyle(color: Colors.white),
+            ))
       ],
     );
   }
@@ -77,10 +78,11 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
     );
   }
 
+// TODO: relogin
   String? _oldValidator(String? v) {
-    if (v != Encryption().secret) {
-      return "Wrong Secret Key";
-    }
+    // if (v != Encryption().secret) {
+    //   return "Wrong Secret Key";
+    // }
     return null;
   }
 
@@ -95,6 +97,21 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
     setState(() {
       _isHidden = !_isHidden;
     });
+  }
+
+  void _onSubmit() async {
+    if (_formKey.currentState!.validate()) {
+      String? error = await Backend()
+          .changePassword(_oldController.text, _newController.text);
+      if (mounted) {
+        if (error == null) {
+          Navigator.of(context).pop();
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(error)));
+        }
+      }
+    }
   }
 
   // void _onSubmit() {
