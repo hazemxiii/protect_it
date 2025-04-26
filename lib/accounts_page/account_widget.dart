@@ -5,6 +5,7 @@ import 'package:protect_it/models/account.dart';
 import 'package:protect_it/models/attribute.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/global.dart';
+import 'package:protect_it/service/shake.dart';
 import 'package:provider/provider.dart';
 
 class AccountWidget extends StatefulWidget {
@@ -149,7 +150,7 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
         if (widget.showContextMenu) _contextMenu(),
         if (widget.attribute.isSensitive)
           InkWell(
-            onTap: () => setState(() => isHidden = !isHidden),
+            onTap: () => _toggleHidden(false),
             child: Icon(isHidden
                 ? Icons.visibility_off_outlined
                 : Icons.visibility_outlined),
@@ -190,6 +191,20 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
         ],
       ),
     );
+  }
+
+  void _toggleHidden(bool fromListener) {
+    setState(() {
+      isHidden = !isHidden;
+    });
+    bool isListening = Shake.onShakeListeners
+        .containsKey("${widget.account.name}${widget.name}");
+    if (!isHidden && !isListening) {
+      Shake.onShakeListeners["${widget.account.name}${widget.name}"] =
+          () => _toggleHidden(true);
+    } else if (isHidden && isListening && !fromListener) {
+      Shake.onShakeListeners.remove("${widget.account.name}${widget.name}");
+    }
   }
 
   void _onContextMenu(String value) {

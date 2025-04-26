@@ -48,6 +48,7 @@ dependencies:
   local_auth: ^2.3.0
   pointycastle: ^3.9.1
   convert: ^3.1.1
+  sensors_plus: ^6.1.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3

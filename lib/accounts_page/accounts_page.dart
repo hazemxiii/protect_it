@@ -6,6 +6,7 @@ import 'package:protect_it/accounts_page/account_widget.dart';
 import 'package:protect_it/models/account.dart';
 import 'package:protect_it/models/attribute.dart';
 import 'package:protect_it/service/account_notifier.dart';
+import 'package:protect_it/service/shake.dart';
 import 'package:protect_it/settings_page/settings_page.dart';
 import 'package:provider/provider.dart';
 
@@ -103,18 +104,6 @@ class _AccountsPageState extends State<AccountsPage> {
             itemBuilder: (context, index) {
               return AccountWidget(account: accounts[index]);
             });
-        // return SingleChildScrollView(
-        //   child: Padding(
-        //     padding: const EdgeInsets.all(10),
-        //     child: Column(
-        //       children: [
-        //         ...accounts.map((account) {
-        //           return AccountWidget(account: account);
-        //         })
-        //       ],
-        //     ),
-        //   ),
-        // );
       }),
     );
   }
@@ -154,6 +143,7 @@ class _SearchWidgetState extends State<SearchWidget>
 
   @override
   void initState() {
+    Shake().start();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
