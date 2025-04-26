@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'dart:typed_data';
+// import 'dart:typed_data';
+// import 'package:pointycastle/key_derivators/pbkdf2.dart';
+// import 'package:pointycastle/digests/sha256.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:protect_it/service/file.dart';
 import 'package:protect_it/service/prefs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pointycastle/export.dart';
-import 'package:pointycastle/key_derivators/pbkdf2.dart';
-import 'package:pointycastle/digests/sha256.dart';
 
 class Encryption {
   static String? _secret;

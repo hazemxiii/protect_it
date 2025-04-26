@@ -158,15 +158,6 @@ class AccountNotifier extends ChangeNotifier {
     // writeUpdate();
   }
 
-  Future<void> reEncrypt() async {
-    // TODO: invoke
-    for (Account a in _accounts) {
-      print("reEncrypting ${a.name}");
-      await updateName(a, a.name);
-    }
-    dataUpdated();
-  }
-
   Map<String, Attribute> addAttribute(Account account) {
     Attribute attr = Attribute(value: "value");
     String name = "newAttribute";

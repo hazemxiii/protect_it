@@ -126,6 +126,22 @@ class Backend {
     final r = await _makeRequest("/change_password",
         data: {"old_password": oldPassword, "new_password": newPassword});
     if (r.ok) {
+      Map<String, dynamic> key = r.data['key'];
+
+      String? decryptedKey = await Encryption().decryptKey(
+          encryptedKeyString: key['encrypted_key'],
+          password: newPassword,
+          saltString: key['salt'],
+          ivString: key['iv']);
+      if (decryptedKey == null) {
+        return "Unknown Error";
+      }
+      Prefs().login(
+          Prefs().username!,
+          newPassword,
+          r.data['access_token'],
+          DateTime.now().add(Duration(seconds: r.data['expires_in'])),
+          decryptedKey);
       return null;
     } else if (r.statusCode == 500) {
       return "Unknown Error";

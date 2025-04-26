@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/service/backend.dart';
-import 'package:protect_it/service/encryption.dart';
 
 class ChangeSecretDialog extends StatefulWidget {
   const ChangeSecretDialog({super.key});
@@ -16,7 +15,7 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
   final _formKey = GlobalKey<FormState>();
 
   bool _isHidden = true;
-
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -38,20 +37,22 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
           ),
         ),
       ),
-      actions: [
-        TextButton(
-            onPressed: Navigator.of(context).pop,
-            child: const Text(
-              "Cancel",
-              style: TextStyle(color: Colors.white),
-            )),
-        TextButton(
-            onPressed: _onSubmit,
-            child: const Text(
-              "Change",
-              style: TextStyle(color: Colors.white),
-            ))
-      ],
+      actions: !_isLoading
+          ? [
+              TextButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  )),
+              TextButton(
+                  onPressed: _onSubmit,
+                  child: const Text(
+                    "Change",
+                    style: TextStyle(color: Colors.white),
+                  ))
+            ]
+          : [const CircularProgressIndicator(color: Colors.white)],
     );
   }
 
@@ -78,7 +79,6 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
     );
   }
 
-// TODO: relogin
   String? _oldValidator(String? v) {
     // if (v != Encryption().secret) {
     //   return "Wrong Secret Key";
@@ -101,6 +101,9 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
 
   void _onSubmit() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
       String? error = await Backend()
           .changePassword(_oldController.text, _newController.text);
       if (mounted) {
@@ -110,6 +113,11 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(error)));
         }
+      }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
