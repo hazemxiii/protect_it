@@ -15,13 +15,24 @@ class AccountNotifier extends ChangeNotifier {
   Future<bool> getData() async {
     getCachedData();
     List<Account>? accounts = await Backend().getAccounts();
+    _sendOfflineRequests();
     if (accounts == null) {
       return false;
     }
     if ((accounts).isNotEmpty) _accounts = accounts;
     _loading = false;
     dataUpdated();
+    // await reEncrypt();
     return true;
+  }
+
+  void _sendOfflineRequests() async {
+    await Backend().sendOfflineRequests();
+    List<Account>? accounts = await Backend().getAccounts();
+    if ((accounts?.isNotEmpty) ?? false) {
+      _accounts = accounts!;
+      dataUpdated();
+    }
   }
 
   void getCachedData() {

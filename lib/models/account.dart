@@ -89,6 +89,7 @@ class Account {
           secKey: secKey,
           color: color);
     } catch (e) {
+      debugPrint("Error in Decrypting Account: ${e.toString()}");
       return null;
     }
   }
