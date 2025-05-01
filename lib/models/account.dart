@@ -42,43 +42,56 @@ class Account {
   late Color _color;
   late Map<String, Attribute> _attributes = {};
 
+  // String toJSON() {
+  //   Encryption en = Encryption();
+  //   Map<String, String> map = {};
+  //   map['id'] = _id;
+  //   map['name'] = en.encryptData(_name);
+  //   map['color'] = _color.toARGB32().toString();
+  //   map['mainKey'] = en.encryptData(_mainKey);
+  //   if (_secKey != "") {
+  //     map['secKey'] = en.encryptData(_secKey);
+  //   }
+  //   for (String attr in attributes.keys) {
+  //     map[en.encryptData(attr)] = _attributes[attr]!.toJSON();
+  //   }
+  //   return jsonEncode(map);
+  // }
+
   String toJSON() {
     Encryption en = Encryption();
-    Map<String, String> map = {};
+    Map<String, dynamic> map = {};
     map['id'] = _id;
-    map['name'] = en.encryptData(_name);
+    map['name'] = _name;
     map['color'] = _color.toARGB32().toString();
-    map['mainKey'] = en.encryptData(_mainKey);
+    map['mainKey'] = _mainKey;
+    map['attributes'] = {};
     if (_secKey != "") {
-      map['secKey'] = en.encryptData(_secKey);
+      map['secKey'] = _secKey;
     }
     for (String attr in attributes.keys) {
-      map[en.encryptData(attr)] = _attributes[attr]!.toJSON();
+      map['attributes'][attr] = _attributes[attr]!.toJSON();
     }
-    return jsonEncode(map);
+    return en.encryptData(jsonEncode(map));
   }
 
   static Account? fromJSON(String json) {
     try {
       Encryption en = Encryption();
-      Map map = jsonDecode(json);
+      Map map = jsonDecode(en.decryptData(json));
       Map<String, Attribute> attributes = {};
-      String name = en.decryptData(map['name']!);
-      Color color = Color(int.parse(map['color']!));
-      String mainKey = en.decryptData(map['mainKey']!);
-      String id = map['id']!;
-
-      String secKey =
-          map['secKey'] != null ? en.decryptData(map['secKey']) : "";
-
-      for (String key in map.keys) {
-        if (key.contains(":")) {
-          Attribute? attr = Attribute.fromJSON(map[key]!);
-          if (attr == null) {
-            return null;
-          }
-          attributes[en.decryptData(key)] = attr;
+      String id = map.remove('id')!;
+      String mainKey = map.remove('mainKey');
+      String name = map.remove('name')!;
+      Color color = Color(int.parse(map.remove('color')!));
+      String secKey = map.remove('secKey') ?? "";
+      Map<String, dynamic> attributesMap = map.remove('attributes')!;
+      for (String key in attributesMap.keys) {
+        Attribute? attr = Attribute.fromJSON(attributesMap[key]);
+        if (attr == null) {
+          return null;
         }
+        attributes[key] = attr;
       }
 
       return Account(

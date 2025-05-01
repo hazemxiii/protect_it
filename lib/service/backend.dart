@@ -22,8 +22,7 @@ class Backend {
       String? requestType}) async {
     bool secure = kReleaseMode;
     // ignore: dead_code
-    String mainPath =
-        secure ? "account-safe-api.vercel.app" : "192.168.1.4:5000";
+    String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
     data ??= {};
     try {
       // ignore: dead_code

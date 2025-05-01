@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:protect_it/service/encryption.dart';
+import 'package:flutter/material.dart';
 
 class Attribute {
   Attribute({
@@ -11,20 +9,19 @@ class Attribute {
   String value;
   bool isSensitive;
 
-  String toJSON() {
+  Map<String, String> toJSON() {
     Map<String, String> map = {};
     map['sensitive'] = isSensitive.toString();
-    map['value'] = Encryption().encryptData(value);
-    return jsonEncode(map);
+    map['value'] = value;
+    return map;
   }
 
-  static Attribute? fromJSON(String json) {
+  static Attribute? fromJSON(Map json) {
     try {
-      Map map = jsonDecode(json);
       return Attribute(
-          value: Encryption().decryptData(map['value']!),
-          isSensitive: (map['sensitive']!) == "true");
+          value: json['value']!, isSensitive: (json['sensitive']!) == "true");
     } catch (e) {
+      debugPrint("Error in Attribute.fromJSON: ${e.toString()}");
       return null;
     }
   }

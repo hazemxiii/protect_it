@@ -22,7 +22,6 @@ class AccountNotifier extends ChangeNotifier {
     if ((accounts).isNotEmpty) _accounts = accounts;
     _loading = false;
     dataUpdated();
-    // await reEncrypt();
     return true;
   }
 
