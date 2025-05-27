@@ -105,12 +105,12 @@ class _AccountsPageState extends State<AccountsPage> {
 
   void _addAccount(BuildContext context) {
     final Account account = Account(
-        mainKey: 'userName',
-        secKey: 'password',
+        mainKey: 'Email',
+        secKey: 'Password',
         name: 'Account',
         attributes: <String, Attribute>{
-          'userName': Attribute(value: 'userName'),
-          'password': Attribute(value: 'password', isSensitive: true)
+          'Email': Attribute(value: 'Email'),
+          'Password': Attribute(value: 'Password', isSensitive: true)
         });
     Provider.of<AccountNotifier>(context, listen: false).addAccount(account);
     Navigator.of(context).push(MaterialPageRoute(

@@ -21,11 +21,9 @@ class Backend {
       bool authorized = true,
       String? requestType}) async {
     const bool secure = kReleaseMode;
-    // ignore: dead_code
     const String mainPath = secure ? 'account-safe-api.vercel.app' : '127.0.0.1:5000';
     data ??= {};
     try {
-      // ignore: dead_code
       final Uri url = secure ? Uri.https(mainPath, path) : Uri.http(mainPath, path);
       final http.Response response = await http.post(url,
           headers: <String, String>{
