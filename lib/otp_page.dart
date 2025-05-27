@@ -13,9 +13,9 @@ class OtpPage extends StatefulWidget {
 }
 
 class _OtpPageState extends State<OtpPage> {
-  final List<TextEditingController> _controllers = [];
+  final List<TextEditingController> _controllers = <TextEditingController>[];
   int _length = 0;
-  final List<FocusNode> _focusNodes = [];
+  final List<FocusNode> _focusNodes = <FocusNode>[];
   int _focusedIndex = 0;
 
   @override
@@ -25,7 +25,7 @@ class _OtpPageState extends State<OtpPage> {
     });
     for (int i = 0; i < 6; i++) {
       _controllers.add(TextEditingController());
-      FocusNode focusNode = FocusNode();
+      final FocusNode focusNode = FocusNode();
       focusNode.addListener(() {
         if (focusNode.hasFocus) {
           setState(() {
@@ -46,18 +46,17 @@ class _OtpPageState extends State<OtpPage> {
     super.dispose();
   }
 
-  BorderSide side = const BorderSide(color: Colors.black);
+  BorderSide side = const BorderSide();
 
   double size = 50;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: <Widget>[
             _titleWidget(),
             const SizedBox(height: 10),
             _subtitleWidget(),
@@ -66,44 +65,36 @@ class _OtpPageState extends State<OtpPage> {
               spacing: 10,
               runSpacing: 10,
               alignment: WrapAlignment.center,
-              direction: Axis.horizontal,
-              children: List.generate(6, (index) => _otpField(index)),
+              children: List.generate(6, (int index) => _otpField(index)),
             ),
           ],
         ),
       ),
     );
-  }
 
-  Widget _titleWidget() {
-    return const Text(
-      "Enter Verifiction Code",
+  Widget _titleWidget() => const Text(
+      'Enter Verifiction Code',
       style: TextStyle(
           fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
     );
-  }
 
-  Widget _subtitleWidget() {
-    return Text(
-      "Enter the 6-digit verification code sent to your email",
+  Widget _subtitleWidget() => Text(
+      'Enter the 6-digit verification code sent to your email',
       style: TextStyle(
           fontSize: 16, color: Color.lerp(Colors.white, Colors.black, 0.5)),
     );
-  }
 
   Widget _otpField(int index) {
-    bool isFilled = _focusedIndex == index;
+    final bool isFilled = _focusedIndex == index;
     return SizedBox(
       width: size,
       height: size,
       child: TextField(
-        inputFormatters: [
+        inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.digitsOnly,
-          TextInputFormatter.withFunction((oldValue, newValue) {
-            return _formatter(index, oldValue, newValue);
-          })
+          TextInputFormatter.withFunction((TextEditingValue oldValue, TextEditingValue newValue) => _formatter(index, oldValue, newValue))
         ],
-        onChanged: (v) => _submit(v),
+        onChanged: (String v) => _submit(v),
         focusNode: _focusNodes[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
@@ -128,7 +119,7 @@ class _OtpPageState extends State<OtpPage> {
 
   TextEditingValue _formatter(
       int index, TextEditingValue oldValue, TextEditingValue newValue) {
-    int nextIndex = index + 1;
+    final int nextIndex = index + 1;
     if (nextIndex < _controllers.length) {
       _focusNodes[nextIndex].requestFocus();
     }
@@ -145,15 +136,15 @@ class _OtpPageState extends State<OtpPage> {
       _length--;
     }
     if (_length == 6) {
-      String otp = _controllers.map((e) => e.text).join();
-      String? error =
+      final String otp = _controllers.map((TextEditingController e) => e.text).join();
+      final String? error =
           await Backend().login(widget.username, widget.password, otp: otp);
       if (!mounted) return;
 
       if (error == null) {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const AccountsPage()),
-            (route) => false);
+            MaterialPageRoute(builder: (BuildContext context) => const AccountsPage()),
+            (Route route) => false);
         return;
       }
 

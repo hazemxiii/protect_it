@@ -4,7 +4,7 @@ import 'package:local_auth/local_auth.dart';
 class Bio {
   Future<bool> bioIsNotEmpty() async {
     if (await bioIsAvailable()) {
-      final auth = LocalAuthentication();
+      final LocalAuthentication auth = LocalAuthentication();
       return (await auth.getAvailableBiometrics()).isNotEmpty;
     }
     return false;
@@ -15,7 +15,7 @@ class Bio {
       if (kIsWeb) {
         return false;
       }
-      final auth = LocalAuthentication();
+      final LocalAuthentication auth = LocalAuthentication();
       return await auth.canCheckBiometrics;
     } catch (e) {
       return false;
@@ -26,7 +26,7 @@ class Bio {
     if (!await bioIsAvailable()) {
       return false;
     }
-    final auth = LocalAuthentication();
+    final LocalAuthentication auth = LocalAuthentication();
     final bool didAuthenticate = await auth.authenticate(
         localizedReason: 'Please Authenticate to Show Details',
         options: const AuthenticationOptions(

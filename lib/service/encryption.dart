@@ -19,29 +19,29 @@ class Encryption {
 
   String encryptData(String plainText) {
     // final keyBytes = encrypt.Key.fromUtf8(Prefs().key!.padRight(32));
-    final keyBytes = base64ToUint8List(Prefs().key!);
-    var sha256 = SHA256Digest();
-    Uint8List derivedKey = sha256.process(Uint8List.fromList(keyBytes));
-    final iv = encrypt.IV.fromLength(16);
-    final encrypter = encrypt.Encrypter(encrypt.AES(encrypt.Key(derivedKey)));
+    final Uint8List keyBytes = base64ToUint8List(Prefs().key!);
+    final SHA256Digest sha256 = SHA256Digest();
+    final Uint8List derivedKey = sha256.process(Uint8List.fromList(keyBytes));
+    final encrypt.IV iv = encrypt.IV.fromLength(16);
+    final encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(encrypt.Key(derivedKey)));
 
-    final encrypted = encrypter.encrypt(plainText, iv: iv);
+    final encrypt.Encrypted encrypted = encrypter.encrypt(plainText, iv: iv);
     return '${base64.encode(iv.bytes)}:${encrypted.base64}';
   }
 
   String decryptData(String encryptedText) {
     try {
-      final parts = encryptedText.split(':');
-      final iv = encrypt.IV.fromBase64(parts[0]);
-      final cipherText = parts[1];
+      final List<String> parts = encryptedText.split(':');
+      final encrypt.IV iv = encrypt.IV.fromBase64(parts[0]);
+      final String cipherText = parts[1];
 
-      final keyBytes = base64ToUint8List(Prefs().key!);
-      var sha256 = SHA256Digest();
-      Uint8List derivedKey = sha256.process(Uint8List.fromList(keyBytes));
+      final Uint8List keyBytes = base64ToUint8List(Prefs().key!);
+      final SHA256Digest sha256 = SHA256Digest();
+      final Uint8List derivedKey = sha256.process(Uint8List.fromList(keyBytes));
 
-      final encrypter = encrypt.Encrypter(encrypt.AES(encrypt.Key(derivedKey)));
+      final encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(encrypt.Key(derivedKey)));
 
-      final decrypted = encrypter.decrypt64(cipherText, iv: iv);
+      final String decrypted = encrypter.decrypt64(cipherText, iv: iv);
       return decrypted;
     } catch (e) {
       throw DecryptFileErrors.wrongKey;
@@ -50,14 +50,14 @@ class Encryption {
 
   String decryptData2(String encryptedText) {
     try {
-      final parts = encryptedText.split(':');
-      final iv = encrypt.IV.fromBase64(parts[0]);
-      final cipherText = parts[1];
+      final List<String> parts = encryptedText.split(':');
+      final encrypt.IV iv = encrypt.IV.fromBase64(parts[0]);
+      final String cipherText = parts[1];
 
-      final keyBytes = encrypt.Key.fromUtf8(Prefs().password!.padRight(32));
-      final encrypter = encrypt.Encrypter(encrypt.AES(keyBytes));
+      final encrypt.Key keyBytes = encrypt.Key.fromUtf8(Prefs().password!.padRight(32));
+      final encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(keyBytes));
 
-      final decrypted = encrypter.decrypt64(cipherText, iv: iv);
+      final String decrypted = encrypter.decrypt64(cipherText, iv: iv);
       return decrypted;
     } catch (e) {
       throw DecryptFileErrors.wrongKey;
@@ -72,30 +72,30 @@ class Encryption {
   }) async {
     try {
       // Register PBKDF2 algorithm
-      final pbkdf2 = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64));
+      final PBKDF2KeyDerivator pbkdf2 = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64));
 
       // Convert password to bytes
-      final passwordBytes = utf8.encode(password);
-      final salt = base64ToUint8List(saltString);
-      final iv = base64ToUint8List(ivString);
-      final encryptedKey = base64ToUint8List(encryptedKeyString);
+      final Uint8List passwordBytes = utf8.encode(password);
+      final Uint8List salt = base64ToUint8List(saltString);
+      final Uint8List iv = base64ToUint8List(ivString);
+      final Uint8List encryptedKey = base64ToUint8List(encryptedKeyString);
 
       // Derive key using PBKDF2 with same parameters as in Python
-      final params = Pbkdf2Parameters(salt, 100000, 32);
+      final Pbkdf2Parameters params = Pbkdf2Parameters(salt, 100000, 32);
       pbkdf2.init(params);
-      final derivedKey = pbkdf2.process(Uint8List.fromList(passwordBytes));
+      final Uint8List derivedKey = pbkdf2.process(Uint8List.fromList(passwordBytes));
 
       // Set up AES-CBC decryption
-      final cipher = PaddedBlockCipher('AES/CBC/PKCS7');
-      final keyParam = KeyParameter(derivedKey);
-      final cipherParams = PaddedBlockCipherParameters(
+      final PaddedBlockCipher cipher = PaddedBlockCipher('AES/CBC/PKCS7');
+      final KeyParameter keyParam = KeyParameter(derivedKey);
+      final PaddedBlockCipherParameters<ParametersWithIV<KeyParameter>, void> cipherParams = PaddedBlockCipherParameters(
         ParametersWithIV(keyParam, iv),
         null,
       );
       cipher.init(false, cipherParams); // false for decryption
 
       // Decrypt the data
-      final decryptedBytes = cipher.process(encryptedKey);
+      final Uint8List decryptedBytes = cipher.process(encryptedKey);
 
       return base64.encode(decryptedBytes);
     } catch (e) {
@@ -104,7 +104,5 @@ class Encryption {
     }
   }
 
-  Uint8List base64ToUint8List(String base64String) {
-    return base64.decode(base64String);
-  }
+  Uint8List base64ToUint8List(String base64String) => base64.decode(base64String);
 }

@@ -19,7 +19,7 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
   @override
   void initState() {
     super.initState();
-    widget.getValue().then((value) {
+    widget.getValue().then((bool value) {
       setState(() {
         _value = value;
       });
@@ -29,15 +29,14 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
   bool? _value;
   bool _loading = false;
   @override
-  Widget build(BuildContext context) {
-    return MaterialButton(
+  Widget build(BuildContext context) => MaterialButton(
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         color: Colors.white,
         textColor: Colors.black,
         onPressed: () => _onPressed(_value),
         child: Row(
-          children: [
+          children: <Widget>[
             Text(widget.text,
                 style: const TextStyle(
                   fontSize: 16,
@@ -50,7 +49,6 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
                     : const Icon(Icons.check_circle, color: Colors.green),
           ],
         ));
-  }
 
   void _onPressed(bool? oldValue) async {
     if (oldValue == null) {
@@ -59,11 +57,11 @@ class _PrivacySectionButtonState extends State<PrivacySectionButton> {
     setState(() {
       _loading = true;
     });
-    bool? b = await widget.onPressed(!oldValue);
+    final bool? b = await widget.onPressed(!oldValue);
     if (b == null) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Failed to Updated")));
+            .showSnackBar(const SnackBar(content: Text('Failed to Updated')));
       }
     } else {
       _value = b;
@@ -77,9 +75,7 @@ class LoadingWidget extends StatelessWidget {
   const LoadingWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const CupertinoActivityIndicator(
+  Widget build(BuildContext context) => const CupertinoActivityIndicator(
       color: Colors.black,
     );
-  }
 }

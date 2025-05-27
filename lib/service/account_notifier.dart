@@ -7,14 +7,14 @@ import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/service/prefs.dart';
 
 class AccountNotifier extends ChangeNotifier {
-  String searchQ = "";
-  List<Account> _accounts = [];
+  String searchQ = '';
+  List<Account> _accounts = <Account>[];
   Map<String, dynamic> deleteAttributeData = {};
   bool _loading = true;
 
   Future<bool> getData() async {
     getCachedData();
-    List<Account>? accounts = await Backend().getAccounts();
+    final List<Account>? accounts = await Backend().getAccounts();
     _sendOfflineRequests();
     if (accounts == null) {
       return false;
@@ -27,7 +27,7 @@ class AccountNotifier extends ChangeNotifier {
 
   void _sendOfflineRequests() async {
     await Backend().sendOfflineRequests();
-    List<Account>? accounts = await Backend().getAccounts();
+    final List<Account>? accounts = await Backend().getAccounts();
     if ((accounts?.isNotEmpty) ?? false) {
       _accounts = accounts!;
       dataUpdated();
@@ -38,13 +38,13 @@ class AccountNotifier extends ChangeNotifier {
     if (!Prefs().isCached) {
       return;
     }
-    List<String> cache = Prefs().getCache();
+    final List<String> cache = Prefs().getCache();
     if (cache.isEmpty) {
       return;
     }
-    List<Account> accounts = [];
+    final List<Account> accounts = <Account>[];
     for (String c in cache) {
-      Account? account = Account.fromJSON(c);
+      final Account? account = Account.fromJSON(c);
       if (account != null) {
         accounts.add(account);
       }
@@ -55,7 +55,7 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   void updateCache() {
-    List<String> cache = [];
+    final List<String> cache = <String>[];
     for (Account a in _accounts) {
       cache.add(a.toJSON());
     }
@@ -63,18 +63,18 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    _accounts = [];
+    _accounts = <Account>[];
     _loading = true;
     dataUpdated();
   }
 
   Future<void> cancel(Account account, Account old) async {
-    int i = _accounts.indexOf(account);
+    final int i = _accounts.indexOf(account);
     _accounts.removeAt(i);
     _accounts.insert(i, old);
     dataUpdated();
-    Response d = await Backend().deleteAccount(account.id);
-    Response r = await Backend().setAccount(account);
+    final Response d = await Backend().deleteAccount(account.id);
+    final Response r = await Backend().setAccount(account);
     if (!d.ok) {}
     if (!r.ok) {}
     // await writeUpdate();
@@ -83,7 +83,7 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> addAccount(Account account) async {
     _accounts.add(account);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -92,7 +92,7 @@ class AccountNotifier extends ChangeNotifier {
       Account account, Attribute attribute, bool v) async {
     attribute.updateSensitivity(v);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -100,7 +100,7 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> setMain(Account account, String key) async {
     account.setMain(key);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -108,7 +108,7 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> setSec(Account account, String key) async {
     account.setSec(key);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -117,7 +117,7 @@ class AccountNotifier extends ChangeNotifier {
       Account account, String value, Attribute attr) async {
     attr.updateValue(value);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -136,7 +136,7 @@ class AccountNotifier extends ChangeNotifier {
     }
     account.attributes.remove(oldKey);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -144,7 +144,7 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> updateColor(Account account, Color c) async {
     account.updateColor(c);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -152,30 +152,30 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> deleteAccount(Account account) async {
     _accounts.remove(account);
     dataUpdated();
-    Response r = await Backend().deleteAccount(account.id);
+    final Response r = await Backend().deleteAccount(account.id);
     if (!r.ok) {}
     // writeUpdate();
   }
 
   Map<String, Attribute> addAttribute(Account account) {
-    Attribute attr = Attribute(value: "value");
-    String name = "newAttribute";
-    List<String> names = account.attributes.keys.toList();
+    final Attribute attr = Attribute(value: 'value');
+    String name = 'newAttribute';
+    final List<String> names = account.attributes.keys.toList();
     while (names.contains(name)) {
-      int number = int.tryParse(name[name.length - 1]) ?? 0;
-      name = "newAttribute_${number + 1}";
+      final int number = int.tryParse(name[name.length - 1]) ?? 0;
+      name = 'newAttribute_${number + 1}';
     }
-    account.addAttributes({name: attr});
+    account.addAttributes(<String, Attribute>{name: attr});
     dataUpdated();
-    Backend().setAccount(account).then((r) {
+    Backend().setAccount(account).then((Response r) {
       if (!r.ok) {}
     });
     // writeUpdate();
-    return {name: attr};
+    return <String, Attribute>{name: attr};
   }
 
   bool deleteAttribute(Account account, String attributeKey) {
-    Attribute? attr = account.deleteAttribute(attributeKey);
+    final Attribute? attr = account.deleteAttribute(attributeKey);
     if (attr == null) {
       return false;
     }
@@ -183,7 +183,7 @@ class AccountNotifier extends ChangeNotifier {
     deleteAttributeData['attribute'] = attr;
     deleteAttributeData['key'] = attributeKey;
     dataUpdated();
-    Backend().setAccount(account).then((r) {
+    Backend().setAccount(account).then((Response r) {
       if (!r.ok) {}
     });
     // writeUpdate();
@@ -191,17 +191,17 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   Future<void> undo() async {
-    Account? account = deleteAttributeData['account'];
-    String? key = deleteAttributeData['key'];
-    Attribute? attribute = deleteAttributeData['attribute'];
+    final Account? account = deleteAttributeData['account'];
+    final String? key = deleteAttributeData['key'];
+    final Attribute? attribute = deleteAttributeData['attribute'];
     if (account != null && key != null && attribute != null) {
       (deleteAttributeData['account'] as Account)
-          .addAttributes({key: attribute});
+          .addAttributes(<String, Attribute>{key: attribute});
     }
     deleteAttributeData = {};
     if (account != null) {
       dataUpdated();
-      Response r = await Backend().setAccount(account);
+      final Response r = await Backend().setAccount(account);
       if (!r.ok) {}
     }
     // writeUpdate();
@@ -210,7 +210,7 @@ class AccountNotifier extends ChangeNotifier {
   Future<void> updateName(Account account, String newName) async {
     account.updateName(newName);
     dataUpdated();
-    Response r = await Backend().setAccount(account);
+    final Response r = await Backend().setAccount(account);
     if (!r.ok) {}
     // writeUpdate();
   }
@@ -244,19 +244,19 @@ class AccountNotifier extends ChangeNotifier {
   }
 
   List<Account> accounts() {
-    if (searchQ.trim() == "") {
+    if (searchQ.trim() == '') {
       return _accounts;
     } else {
-      List<Account> filtered = [];
-      List<ExtractedResult<String>> result = extractTop(
+      final List<Account> filtered = <Account>[];
+      final List<ExtractedResult<String>> result = extractTop(
         query: searchQ,
         choices: Account.names.keys.toList(),
         limit: 10,
         cutoff: 50,
       );
 
-      for (var r in result) {
-        Account account = Account.names[r.choice]!;
+      for (ExtractedResult<String> r in result) {
+        final Account account = Account.names[r.choice]!;
         if (_accounts.contains(account)) {
           filtered.add(account);
         }

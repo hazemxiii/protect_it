@@ -10,7 +10,7 @@ class Attribute {
   bool isSensitive;
 
   Map<String, String> toJSON() {
-    Map<String, String> map = {};
+    final Map<String, String> map = <String, String>{};
     map['sensitive'] = isSensitive.toString();
     map['value'] = value;
     return map;
@@ -19,9 +19,9 @@ class Attribute {
   static Attribute? fromJSON(Map json) {
     try {
       return Attribute(
-          value: json['value']!, isSensitive: (json['sensitive']!) == "true");
+          value: json['value']!, isSensitive: (json['sensitive']!) == 'true');
     } catch (e) {
-      debugPrint("Error in Attribute.fromJSON: ${e.toString()}");
+      debugPrint('Error in Attribute.fromJSON: ${e.toString()}');
       return null;
     }
   }

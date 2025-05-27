@@ -15,36 +15,32 @@ class PrivacySectionWidget extends StatefulWidget {
 
 class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
   @override
-  Widget build(BuildContext context) {
-    return SettingsSectionWidget(
+  Widget build(BuildContext context) => SettingsSectionWidget(
         content: Column(
-          children: [
+          children: <Widget>[
             PrivacySectionButton(
-                getValue: _getOtp, onPressed: (v) => _setOtp(v), text: "OTP"),
+                getValue: _getOtp, onPressed: (bool v) => _setOtp(v), text: 'OTP'),
             PrivacySectionButton(
                 getValue: () => Future.value(Prefs().pin != null),
-                text: "Pin",
-                onPressed: (v) => _setPin(v)),
+                text: 'Pin',
+                onPressed: (bool v) => _setPin(v)),
             FutureBuilder(
                 future: Bio().bioIsAvailable(),
-                builder: (context, snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                   if (snapshot.hasData && snapshot.data == true) {
                     return PrivacySectionButton(
                         getValue: _getBiometric,
-                        text: "Biometric",
-                        onPressed: (v) => _setBiometric(v));
+                        text: 'Biometric',
+                        onPressed: (bool v) => _setBiometric(v));
                   }
                   return const SizedBox.shrink();
                 }),
           ],
         ),
-        title: "Privacy Settings",
-        hint: "Extra Privacy Steps");
-  }
+        title: 'Privacy Settings',
+        hint: 'Extra Privacy Steps');
 
-  Future<bool> _getOtp() async {
-    return await Backend().otpEnabled;
-  }
+  Future<bool> _getOtp() async => await Backend().otpEnabled;
 
   Future<bool> _getBiometric() async {
     if (await Bio().bioIsNotEmpty()) {
@@ -54,7 +50,7 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
   }
 
   Future<bool?> _setOtp(bool v) async {
-    bool? b = await Backend().setOtp(v);
+    final bool? b = await Backend().setOtp(v);
     if (b == null) {
       return null;
     }
@@ -64,7 +60,7 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
   Future<bool?> _setBiometric(bool v) async {
     if (Prefs().pin == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please set a pin first")),
+        const SnackBar(content: Text('Please set a pin first')),
       );
       return null;
     }
@@ -76,7 +72,7 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
     if (!v) {
       Prefs().setPin(null);
     } else {
-      String? r = await _getNewPin();
+      final String? r = await _getNewPin();
       if (r != null) {
         Prefs().setPin(r);
       }
@@ -85,17 +81,17 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
   }
 
   Future<String?> _getNewPin() async {
-    var pin = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => PinPage(
+    final pin = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => PinPage(
               onSubmit: _onPinSubmit,
-              title: "Enter New Pin",
+              title: 'Enter New Pin',
             )));
 
     if (!mounted) return null;
-    var pinConfirm = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => PinPage(
+    final pinConfirm = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => PinPage(
               onSubmit: _onPinConfirmSubmit,
-              title: "Confirm New Pin",
+              title: 'Confirm New Pin',
               pin: pin,
             )));
     if (pin != null && pin == pinConfirm) {
@@ -114,9 +110,9 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
     if (pinNot.value == pin) {
       Navigator.pop(context, pinNot.value);
     } else {
-      pinNot.value = "";
+      pinNot.value = '';
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Pin does not match")),
+        const SnackBar(content: Text('Pin does not match')),
       );
     }
   }

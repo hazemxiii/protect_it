@@ -37,8 +37,7 @@ class _UndoWidgetState extends State<UndoWidget> with TickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
+  Widget build(BuildContext context) => InkWell(
       onTap: () {
         Provider.of<AccountNotifier>(context, listen: false).undo();
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -49,14 +48,14 @@ class _UndoWidgetState extends State<UndoWidget> with TickerProviderStateMixin {
             borderRadius: const BorderRadius.all(Radius.circular(5))),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             const Padding(
               padding: EdgeInsets.all(8.0),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: <Widget>[
                   Text(
-                    "Undo",
+                    'Undo',
                     style: TextStyle(color: Colors.white),
                   ),
                   VerticalDivider(
@@ -78,7 +77,6 @@ class _UndoWidgetState extends State<UndoWidget> with TickerProviderStateMixin {
         ),
       ),
     );
-  }
 }
 
 class EditAttributeWidget extends StatefulWidget {
@@ -98,7 +96,7 @@ class EditAttributeWidget extends StatefulWidget {
 class _EditAttributeWidgetState extends State<EditAttributeWidget> {
   late TextEditingController nameController;
   late TextEditingController valueController;
-  final formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late AccountNotifier accountNotifier;
 
   @override
@@ -110,55 +108,51 @@ class _EditAttributeWidgetState extends State<EditAttributeWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
+  Widget build(BuildContext context) => AlertDialog(
       surfaceTintColor: widget.account.color,
       content: Form(
         key: formKey,
-        child: Consumer<AccountNotifier>(builder: (context, not, _) {
-          return Column(
+        child: Consumer<AccountNotifier>(builder: (BuildContext context, AccountNotifier not, _) => Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
+            children: <Widget>[
               SwitchListTile(
                   activeColor: widget.account.color,
                   inactiveTrackColor: Colors.white,
                   inactiveThumbColor: widget.account.color,
                   title: Text(
-                    "Sensitive",
+                    'Sensitive',
                     style: TextStyle(color: widget.account.color),
                   ),
                   value: widget.attr.isSensitive,
-                  onChanged: (v) {
+                  onChanged: (bool v) {
                     not.setSensitive(widget.account, widget.attr, v);
                   }),
               _input(nameController, _attrNameValidator, false, false),
               _input(valueController, _attrValueValidator,
                   widget.attr.isSensitive, true),
             ],
-          );
-        }),
+          )),
       ),
-      actions: [
+      actions: <Widget>[
         TextButton(
             style: ButtonStyle(
                 backgroundColor:
                     const WidgetStatePropertyAll(Colors.transparent),
                 foregroundColor: WidgetStatePropertyAll(widget.account.color)),
             onPressed: save,
-            child: const Text("Save"))
+            child: const Text('Save'))
       ],
     );
-  }
 
   String? _attrNameValidator(String? s) {
-    if (widget.account.isAttributeExist(s ?? "") && s != widget.attrKey) {
-      return "Attribute Name Already Exist";
+    if (widget.account.isAttributeExist(s ?? '') && s != widget.attrKey) {
+      return 'Attribute Name Already Exist';
     }
     return null;
   }
 
   String? _attrValueValidator(String? s) {
-    if ((s ?? "") == "") {
+    if ((s ?? '') == '') {
       return "Can't be an empty field";
     }
     return null;
@@ -176,9 +170,9 @@ class _EditAttributeWidgetState extends State<EditAttributeWidget> {
 
   TextFormField _input(TextEditingController controller,
       FormFieldValidator<String?> validator, bool hide, bool showRandomiser) {
-    final border = UnderlineInputBorder(
-        borderSide: BorderSide(color: widget.account.color, width: 1));
-    final focusBorder = UnderlineInputBorder(
+    final UnderlineInputBorder border = UnderlineInputBorder(
+        borderSide: BorderSide(color: widget.account.color));
+    final UnderlineInputBorder focusBorder = UnderlineInputBorder(
         borderSide: BorderSide(color: widget.account.color, width: 3));
     return TextFormField(
       obscureText: hide,

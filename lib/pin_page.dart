@@ -9,20 +9,18 @@ class PinPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ValueNotifier<String> pinNot = ValueNotifier("");
+    final ValueNotifier<String> pinNot = ValueNotifier('');
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
           spacing: 20,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: <Widget>[
             Text(title, style: const TextStyle(fontSize: 20)),
             ValueListenableBuilder(
               valueListenable: pinNot,
-              builder: (context, value, child) {
-                return PinInput(pin: value);
-              },
+              builder: (BuildContext context, String value, Widget? child) => PinInput(pin: value),
             ),
             PinKeyboard(pinNot: pinNot, onSubmit: onSubmit, pin: pin),
           ],
@@ -40,20 +38,15 @@ class PinInput extends StatelessWidget {
   final Color color = Colors.black;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       spacing: 3,
       mainAxisAlignment: MainAxisAlignment.center,
       children: _children,
     );
-  }
 
-  List<Widget> get _children {
-    return List.generate(4, (index) => _pinField(index < pin.length));
-  }
+  List<Widget> get _children => List.generate(4, (int index) => _pinField(index < pin.length));
 
-  Widget _pinField(bool active) {
-    return AnimatedContainer(
+  Widget _pinField(bool active) => AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: size,
       height: size,
@@ -62,7 +55,6 @@ class PinInput extends StatelessWidget {
         color: active ? color : Color.lerp(Colors.white, color, 0.2),
       ),
     );
-  }
 }
 
 class PinKeyboard extends StatelessWidget {
@@ -78,8 +70,7 @@ class PinKeyboard extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
+  Widget build(BuildContext context) => ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 300, maxHeight: 400),
       child: GridView(
         gridDelegate:
@@ -87,25 +78,22 @@ class PinKeyboard extends StatelessWidget {
         children: _children(context),
       ),
     );
-  }
 
-  List<Widget> _children(BuildContext context) {
-    return List.generate(12, (index) => _key(index, context));
-  }
+  List<Widget> _children(BuildContext context) => List.generate(12, (int index) => _key(index, context));
 
   Widget _key(int index, BuildContext context) {
-    String text = "";
+    String text = '';
     Widget child = const SizedBox();
     if (index < 9) {
       text = (index + 1).toString();
     } else if (index == 10) {
-      text = "0";
+      text = '0';
     } else if (index == 11) {
-      text = "back";
+      text = 'back';
     }
-    if (text == "back") {
+    if (text == 'back') {
       child = const Icon(Icons.arrow_back_ios);
-    } else if (text != "") {
+    } else if (text != '') {
       child = Text(text, style: textStyle);
     }
     return child is SizedBox
@@ -121,7 +109,7 @@ class PinKeyboard extends StatelessWidget {
   }
 
   void _onType(String text, BuildContext context) {
-    if (text == "back") {
+    if (text == 'back') {
       pinNot.value = pinNot.value.substring(0, pinNot.value.length - 1);
     } else {
       pinNot.value += text;

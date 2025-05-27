@@ -24,7 +24,7 @@ class _LogoutSnackbarState extends State<LogoutSnackbar>
     _controller.addListener(() {
       if (_controller.isCompleted) {
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const SignInPage()));
+            MaterialPageRoute(builder: (BuildContext context) => const SignInPage()));
       }
       setState(() {});
     });
@@ -38,12 +38,12 @@ class _LogoutSnackbarState extends State<LogoutSnackbar>
 
   @override
   Widget build(BuildContext context) {
-    const style = TextStyle(color: Colors.blue);
+    const TextStyle style = TextStyle(color: Colors.blue);
     return Column(
-      children: [
+      children: <Widget>[
         Row(
-          children: [
-            const Text("Your session has expired. Please sign in again.",
+          children: <Widget>[
+            const Text('Your session has expired. Please sign in again.',
                 style: style),
             TextButton(
                 onPressed: () {
@@ -52,7 +52,7 @@ class _LogoutSnackbarState extends State<LogoutSnackbar>
                       MaterialPageRoute(builder: (_) => const SignInPage()),
                       (_) => false);
                 },
-                child: const Text("Sign in again", style: style)),
+                child: const Text('Sign in again', style: style)),
           ],
         ),
         LinearProgressIndicator(

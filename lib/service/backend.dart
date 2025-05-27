@@ -10,7 +10,7 @@ import 'package:protect_it/widgets/logout_snackbar.dart';
 
 class Backend {
   Backend._();
-  static final _instance = Backend._();
+  static final Backend _instance = Backend._();
   factory Backend() => _instance;
   bool? _otpEnabled;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -20,23 +20,23 @@ class Backend {
       {Map<String, dynamic>? data,
       bool authorized = true,
       String? requestType}) async {
-    bool secure = kReleaseMode;
+    const bool secure = kReleaseMode;
     // ignore: dead_code
-    String mainPath = secure ? "account-safe-api.vercel.app" : "127.0.0.1:5000";
+    const String mainPath = secure ? 'account-safe-api.vercel.app' : '127.0.0.1:5000';
     data ??= {};
     try {
       // ignore: dead_code
-      final url = secure ? Uri.https(mainPath, path) : Uri.http(mainPath, path);
-      final response = await http.post(url,
-          headers: {
-            "Content-Type": "application/json",
+      final Uri url = secure ? Uri.https(mainPath, path) : Uri.http(mainPath, path);
+      final http.Response response = await http.post(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
             if (Prefs().getAccessToken().isNotEmpty)
-              "Authorization": "Bearer ${Prefs().getAccessToken()}"
+              'Authorization': 'Bearer ${Prefs().getAccessToken()}'
           },
           body: jsonEncode(data));
-      dynamic r = jsonDecode(response.body);
+      final dynamic r = jsonDecode(response.body);
       if (r is Map<String, dynamic>) {
-        if (r['message'] == "Invalid token") {
+        if (r['message'] == 'Invalid token') {
           _logout();
         }
       }
@@ -54,15 +54,15 @@ class Backend {
   }
 
   void ping() async {
-    final r = await _makeRequest("/");
-    debugPrint(r.ok ? "Success" : "Fail");
+    final Response r = await _makeRequest('/');
+    debugPrint(r.ok ? 'Success' : 'Fail');
     debugPrint(r.data.toString());
   }
 
   void sendOfflineRequest() async {}
 
   Future<bool?> isLoggedIn() async {
-    final r = await _makeRequest("/");
+    final Response r = await _makeRequest('/');
     if (r.ok) {
       if (r.data['error']) {
         return null;
@@ -73,32 +73,32 @@ class Backend {
   }
 
   Future<String?> register(String username, String password) async {
-    final r = await _makeRequest("/register",
-        data: {"username": username, "password": password}, authorized: false);
+    final Response r = await _makeRequest('/register',
+        data: {'username': username, 'password': password}, authorized: false);
     if (r.ok) {
       return null;
     }
     if (r.data is Map<String, dynamic>) {
       return r.data['message'];
     }
-    return "Unknown Error";
+    return 'Unknown Error';
   }
 
   Future<String?> login(String username, String password, {String? otp}) async {
-    final r = await _makeRequest("/login",
-        data: {"username": username, "password": password, "otp": otp},
+    final Response r = await _makeRequest('/login',
+        data: {'username': username, 'password': password, 'otp': otp},
         authorized: false);
     if (r.ok) {
       if ((r.data as Map<String, dynamic>).containsKey('access_token')) {
-        Map<String, dynamic> key = r.data['key'];
+        final Map<String, dynamic> key = r.data['key'];
 
-        String? decryptedKey = await Encryption().decryptKey(
+        final String? decryptedKey = await Encryption().decryptKey(
             encryptedKeyString: key['encrypted_key'],
             password: password,
             saltString: key['salt'],
             ivString: key['iv']);
         if (decryptedKey == null) {
-          return "Unknown Error";
+          return 'Unknown Error';
         }
         Prefs().login(
             username,
@@ -112,29 +112,29 @@ class Backend {
       return null;
     }
     if (r.data is Map<String, dynamic>) {
-      String message = r.data['message'];
+      final String message = r.data['message'];
       // if (message == "Invalid token") {
       //   Prefs().logout();
       // }
       return message;
     }
-    return "Unknown Error";
+    return 'Unknown Error';
   }
 
   Future<String?> changePassword(String oldPassword, String newPassword) async {
     /// Returns null if success, error message if not
-    final r = await _makeRequest("/change_password",
-        data: {"old_password": oldPassword, "new_password": newPassword});
+    final Response r = await _makeRequest('/change_password',
+        data: {'old_password': oldPassword, 'new_password': newPassword});
     if (r.ok) {
-      Map<String, dynamic> key = r.data['key'];
+      final Map<String, dynamic> key = r.data['key'];
 
-      String? decryptedKey = await Encryption().decryptKey(
+      final String? decryptedKey = await Encryption().decryptKey(
           encryptedKeyString: key['encrypted_key'],
           password: newPassword,
           saltString: key['salt'],
           ivString: key['iv']);
       if (decryptedKey == null) {
-        return "Unknown Error";
+        return 'Unknown Error';
       }
       Prefs().login(
           Prefs().username!,
@@ -144,23 +144,23 @@ class Backend {
           decryptedKey);
       return null;
     } else if (r.statusCode == 500) {
-      return "Unknown Error";
+      return 'Unknown Error';
     }
     return r.data['message'];
   }
 
   Future<bool> logout() async {
-    final r = await _makeRequest("/logout");
+    final Response r = await _makeRequest('/logout');
     return r.ok;
   }
 
   Future<List<Account>?> getAccounts() async {
-    final r = await _makeRequest("/accounts");
+    final Response r = await _makeRequest('/accounts');
     if (r.ok) {
-      List<Account> accounts = [];
-      List<dynamic> data = r.data['accounts'];
+      final List<Account> accounts = <Account>[];
+      final List<dynamic> data = r.data['accounts'];
       for (String s in data) {
-        Account? a = Account.fromJSON(s);
+        final Account? a = Account.fromJSON(s);
         if (a == null) {
           return null;
         }
@@ -168,15 +168,15 @@ class Backend {
       }
       return accounts;
     }
-    return [];
+    return <Account>[];
   }
 
   Future<void> sendOfflineRequests() async {
-    List<OfflineRequest> requests = Prefs().getOfflineRequests();
+    final List<OfflineRequest> requests = Prefs().getOfflineRequests();
     for (OfflineRequest request in requests) {
-      String resource =
-          request.requestType == "set" ? "/accounts/set" : "/accounts/delete";
-      Response r = await _makeRequest(
+      final String resource =
+          request.requestType == 'set' ? '/accounts/set' : '/accounts/delete';
+      final Response r = await _makeRequest(
         resource,
         data: jsonDecode(request.data),
       );
@@ -187,7 +187,7 @@ class Backend {
   }
 
   Future<bool?> setOtp(bool otp) async {
-    final r = await _makeRequest("/otp/set", data: {"otp": otp});
+    final Response r = await _makeRequest('/otp/set', data: {'otp': otp});
     if (r.ok) {
       _otpEnabled = r.data['otp'];
       return r.data['otp'];
@@ -196,15 +196,15 @@ class Backend {
   }
 
   Future<Response> setAccount(Account account) async {
-    final r = await _makeRequest("/accounts/set",
-        requestType: "set",
-        data: {"account": account.toJSON(), "id": account.id});
+    final Response r = await _makeRequest('/accounts/set',
+        requestType: 'set',
+        data: {'account': account.toJSON(), 'id': account.id});
     return r;
   }
 
   Future<Response> deleteAccount(String id) async {
-    final r = await _makeRequest("/accounts/delete",
-        requestType: "delete", data: {"id": id});
+    final Response r = await _makeRequest('/accounts/delete',
+        requestType: 'delete', data: {'id': id});
     if (r.statusCode == 500) {}
     return r;
   }
@@ -215,19 +215,17 @@ class Backend {
     scaffoldMessengerKey.currentState?.showSnackBar(_signOutWidget());
   }
 
-  SnackBar _signOutWidget() {
-    return SnackBar(
+  SnackBar _signOutWidget() => SnackBar(
         duration: const Duration(seconds: 5),
         backgroundColor: Color.lerp(Colors.blue, Colors.white, 0.9),
         behavior: SnackBarBehavior.floating,
         content: const LogoutSnackbar());
-  }
 
   Future<bool> get otpEnabled async {
     if (_otpEnabled != null) {
       return _otpEnabled!;
     }
-    final r = await _makeRequest("/otp/get");
+    final Response r = await _makeRequest('/otp/get');
     if (r.ok) {
       _otpEnabled = r.data['otp'];
     }

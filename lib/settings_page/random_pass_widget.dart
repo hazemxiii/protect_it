@@ -13,7 +13,7 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
   RandomPass randomPassGenerator = Prefs().getRandomPass();
   // RandomPass prevState = Prefs.getRandomPass();
   late TextEditingController _controller;
-  final _generatedController = TextEditingController();
+  final TextEditingController _generatedController = TextEditingController();
 
   @override
   void initState() {
@@ -23,18 +23,17 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _switch("Use Uppercase", randomPassGenerator.upper,
+  Widget build(BuildContext context) => Column(
+      children: <Widget>[
+        _switch('Use Uppercase', randomPassGenerator.upper,
             randomPassGenerator.setUpper),
-        _switch("Use Lowercase", randomPassGenerator.lower,
+        _switch('Use Lowercase', randomPassGenerator.lower,
             randomPassGenerator.setLower),
-        _switch("Use Numbers", randomPassGenerator.nums,
+        _switch('Use Numbers', randomPassGenerator.nums,
             randomPassGenerator.setNums),
-        _switch("Use Special Characters", randomPassGenerator.specialActive,
+        _switch('Use Special Characters', randomPassGenerator.specialActive,
             randomPassGenerator.setSpecialActive),
-        _input("Special Characters", null, false, _controller),
+        _input('Special Characters', null, false, _controller),
         const SizedBox(
           height: 5,
         ),
@@ -43,13 +42,11 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
         const SizedBox(
           height: 5,
         ),
-        _input("Generated Password", _suffix(), true, _generatedController),
+        _input('Generated Password', _suffix(), true, _generatedController),
       ],
     );
-  }
 
-  Widget _switch(String text, bool value, Function onTap) {
-    return SwitchListTile(
+  Widget _switch(String text, bool value, Function onTap) => SwitchListTile(
       activeColor: Colors.white,
       activeTrackColor: Colors.black,
       inactiveThumbColor: Colors.black,
@@ -57,19 +54,18 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
       hoverColor: Colors.transparent,
       contentPadding: const EdgeInsets.all(0),
       value: value,
-      onChanged: (v) => _applyChanges(onTap, v),
+      onChanged: (bool v) => _applyChanges(onTap, v),
       title: Text(text),
     );
-  }
 
   Widget _input(String hintText, IconButton? suffix, bool isGenerateInput,
       TextEditingController controller) {
-    const border = OutlineInputBorder(
+    const OutlineInputBorder border = OutlineInputBorder(
         borderSide: BorderSide(color: Colors.grey),
         borderRadius: BorderRadius.all(Radius.circular(5)));
 
-    const borderF = OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 2),
+    const OutlineInputBorder borderF = OutlineInputBorder(
+        borderSide: BorderSide(width: 2),
         borderRadius: BorderRadius.all(Radius.circular(5)));
     return TextField(
       // enabled: !isGenerateInput,
@@ -83,25 +79,22 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
           enabledBorder: border,
           hintText: hintText),
       onChanged: !isGenerateInput
-          ? (v) => _applyChanges(randomPassGenerator.setSpecial, v)
+          ? (String v) => _applyChanges(randomPassGenerator.setSpecial, v)
           : null,
       controller: controller,
     );
   }
 
-  Widget _lengthIndicator() {
-    return Row(
-      children: [
+  Widget _lengthIndicator() => Row(
+      children: <Widget>[
         Text(
-          "Password Length: ${randomPassGenerator.length}",
+          'Password Length: ${randomPassGenerator.length}',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
     );
-  }
 
-  Widget _lengthSlider() {
-    return Slider(
+  Widget _lengthSlider() => Slider(
         thumbColor: Colors.white,
         label: randomPassGenerator.length.toString(),
         activeColor: Colors.black,
@@ -109,13 +102,11 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
         max: 100,
         divisions: 94,
         value: randomPassGenerator.length.toDouble(),
-        onChanged: (v) {
+        onChanged: (double v) {
           _applyChanges(randomPassGenerator.setLength, v.toInt());
         });
-  }
 
-  IconButton _suffix() {
-    return IconButton(
+  IconButton _suffix() => IconButton(
         onPressed: () {
           setState(() {
             _generatedController.text = randomPassGenerator.create();
@@ -125,9 +116,8 @@ class _RandomPassWidgetState extends State<RandomPassWidget> {
           Icons.restart_alt_rounded,
           color: Colors.black,
         ));
-  }
 
-  void _applyChanges(Function onTap, dynamic v) async {
+  void _applyChanges(Function onTap, v) async {
     onTap(v);
     await Prefs().saveRandomPassData(randomPassGenerator);
     setState(() {});

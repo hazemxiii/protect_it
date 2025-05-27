@@ -10,7 +10,7 @@ void copy(BuildContext context, Color c, String value) async {
 
 void _showCopiedSnackBack(BuildContext context, Color c, String s) async {
   ScaffoldMessenger.of(context).clearSnackBars();
-  String copied = await FlutterClipboard.paste();
+  final String copied = await FlutterClipboard.paste();
   if (s != copied) {
     return;
   }
@@ -28,7 +28,7 @@ void _showCopiedSnackBack(BuildContext context, Color c, String s) async {
                 horizontal: (MediaQuery.of(context).size.width - 170) / 2),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: <Widget>[
                 Container(
                   height: 30,
                   width: 30,
@@ -44,7 +44,7 @@ void _showCopiedSnackBack(BuildContext context, Color c, String s) async {
                   width: 10,
                 ),
                 Text(
-                  "Copied",
+                  'Copied',
                   style: TextStyle(color: c),
                 ),
               ],

@@ -11,10 +11,8 @@ class OfflineRequest {
     return OfflineRequest(data: data['data'], requestType: data['requestType']);
   }
 
-  String toJSON() {
-    return jsonEncode({
-      "data": data,
-      "requestType": requestType,
+  String toJSON() => jsonEncode(<String, String>{
+      'data': data,
+      'requestType': requestType,
     });
-  }
 }

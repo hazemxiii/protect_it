@@ -2,14 +2,14 @@ import 'dart:math';
 
 class RandomPass {
   late int _length;
-  final Set<String> _special = {};
+  final Set<String> _special = <String>{};
 
   late bool _upper;
   late bool _lower;
   late bool _nums;
   late bool _specialActive;
 
-  final Map<String, Function> _generator = {};
+  final Map<String, Function> _generator = <String, Function>{};
 
   RandomPass({
     required bool upper,
@@ -29,27 +29,25 @@ class RandomPass {
 
   void _setGenerators() {
     if (_upper) {
-      int a = "A".codeUnitAt(0);
-      int z = "Z".codeUnitAt(0);
-      _generator['upper'] = () {
-        return String.fromCharCode(Random().nextInt(z - a + 1) + a);
-      };
+      final int a = 'A'.codeUnitAt(0);
+      final int z = 'Z'.codeUnitAt(0);
+      _generator['upper'] = () => String.fromCharCode(Random().nextInt(z - a + 1) + a);
     } else {
-      _generator.remove("upper");
+      _generator.remove('upper');
     }
     if (_lower) {
       _generator['lower'] = () {
-        int a = "a".codeUnitAt(0);
-        int z = "z".codeUnitAt(0);
+        final int a = 'a'.codeUnitAt(0);
+        final int z = 'z'.codeUnitAt(0);
         return String.fromCharCode(Random().nextInt(z - a + 1) + a);
       };
     } else {
-      _generator.remove("lower");
+      _generator.remove('lower');
     }
     if (_nums) {
       _generator['nums'] = () => Random().nextInt(10).toString();
     } else {
-      _generator.remove("nums");
+      _generator.remove('nums');
     }
     if (_specialActive && _special.isNotEmpty) {
       _special.addAll(special);
@@ -57,22 +55,22 @@ class RandomPass {
           () => _special.elementAt(Random().nextInt(_special.length));
     } else {
       _specialActive = false;
-      _generator.remove("special");
+      _generator.remove('special');
     }
   }
 
   String create() {
     _setGenerators();
-    String s = "";
+    String s = '';
     for (int i = 0; i < _length; i++) {
-      List<String> keys = _generator.keys.toList();
+      final List<String> keys = _generator.keys.toList();
       if (keys.isEmpty) {
-        return "";
+        return '';
       }
       try {
         s += _generator[keys[Random().nextInt(keys.length)]]!();
       } catch (e) {
-        s += "";
+        s += '';
       }
     }
     return s;
@@ -96,7 +94,7 @@ class RandomPass {
 
   void setSpecial(String s) {
     _special.clear();
-    _special.addAll(s.split("").toSet());
+    _special.addAll(s.split('').toSet());
     if (_special.isEmpty) {
       _specialActive = false;
     }

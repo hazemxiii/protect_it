@@ -12,27 +12,26 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _showPassword = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text("Sign In"),
+        title: const Text('Sign In'),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           spacing: 10,
-          children: [
-            _input("Username", _usernameController),
-            _input("Password", _passwordController,
+          children: <Widget>[
+            _input('Username', _usernameController),
+            _input('Password', _passwordController,
                 showPassword: _showPassword),
             const SizedBox(height: 20),
             _btn(),
@@ -41,7 +40,6 @@ class _SignInPageState extends State<SignInPage> {
         ),
       ),
     );
-  }
 
   Widget _btn() {
     if (_isLoading) {
@@ -56,25 +54,22 @@ class _SignInPageState extends State<SignInPage> {
       textColor: Colors.white,
       color: Colors.black,
       onPressed: _signIn,
-      child: const Text("Sign In"),
+      child: const Text('Sign In'),
     );
   }
 
-  Widget _signUpBtn() {
-    return TextButton(
+  Widget _signUpBtn() => TextButton(
         style: TextButton.styleFrom(
           foregroundColor: Colors.blue,
         ),
         onPressed: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const SignUpPage())),
+            MaterialPageRoute(builder: (BuildContext context) => const SignUpPage())),
         child: const Text(
-          "Sign Up",
+          'Sign Up',
         ));
-  }
 
   Widget _input(String label, TextEditingController controller,
-      {bool? showPassword}) {
-    return Container(
+      {bool? showPassword}) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
         color: Color.lerp(Colors.white, Colors.black, 0.05),
@@ -88,10 +83,8 @@ class _SignInPageState extends State<SignInPage> {
         decoration: inputDecoration(label, showPassword),
       ),
     );
-  }
 
-  InputDecoration inputDecoration(String label, bool? showPassword) {
-    return InputDecoration(
+  InputDecoration inputDecoration(String label, bool? showPassword) => InputDecoration(
       suffixIcon: showPassword != null
           ? IconButton(
               onPressed: () {
@@ -108,13 +101,12 @@ class _SignInPageState extends State<SignInPage> {
       labelText: label,
       border: InputBorder.none,
     );
-  }
 
   Future<void> _signIn() async {
     setState(() {
       _isLoading = true;
     });
-    final error = await Backend()
+    final String? error = await Backend()
         .login(_usernameController.text, _passwordController.text);
     setState(() {
       _isLoading = false;
@@ -130,7 +122,7 @@ class _SignInPageState extends State<SignInPage> {
         if (!mounted) return;
         Navigator.of(context).push(
           MaterialPageRoute(
-              builder: (context) => OtpPage(
+              builder: (BuildContext context) => OtpPage(
                     username: _usernameController.text,
                     password: _passwordController.text,
                   )),
@@ -139,7 +131,7 @@ class _SignInPageState extends State<SignInPage> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const AccountsPage()),
+          MaterialPageRoute(builder: (BuildContext context) => const AccountsPage()),
         );
       }
     }

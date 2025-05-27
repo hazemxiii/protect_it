@@ -22,8 +22,7 @@ class AccountWidget extends StatefulWidget {
 class _AccountWidgetState extends State<AccountWidget> {
   bool isSensitiveShown = false;
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -31,10 +30,10 @@ class _AccountWidgetState extends State<AccountWidget> {
           borderRadius: const BorderRadius.all(Radius.circular(5))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Row(
             spacing: 5,
-            children: [
+            children: <Widget>[
               CircleAvatar(
                 backgroundColor: widget.account.color,
                 radius: 5,
@@ -66,9 +65,9 @@ class _AccountWidgetState extends State<AccountWidget> {
           InkWell(
               onTap: _openDetails,
               child: Row(
-                children: [
+                children: <Widget>[
                   Expanded(
-                    child: Text("Show details →",
+                    child: Text('Show details →',
                         style: TextStyle(color: widget.account.color),
                         overflow: TextOverflow.ellipsis),
                   ),
@@ -77,14 +76,11 @@ class _AccountWidgetState extends State<AccountWidget> {
         ],
       ),
     );
-  }
 
   void _openDetails() {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) =>
-            Consumer<AccountNotifier>(builder: (context, accountNot, _) {
-              return AccountDetailsPage(account: widget.account);
-            })));
+            Consumer<AccountNotifier>(builder: (BuildContext context, AccountNotifier accountNot, _) => AccountDetailsPage(account: widget.account))));
   }
 }
 
@@ -123,13 +119,12 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
 
   bool isHidden = false;
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
+  Widget build(BuildContext context) => Row(
+      children: <Widget>[
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Text(
                 widget.name,
                 style: const TextStyle(color: Colors.grey),
@@ -138,7 +133,7 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
               ),
               Text(
                 isHidden
-                    ? "".padLeft(widget.attribute.value.length, "•")
+                    ? ''.padLeft(widget.attribute.value.length, '•')
                     : widget.attribute.value,
                 style: const TextStyle(fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
@@ -161,62 +156,55 @@ class _AccountAttributeWidgetState extends State<AccountAttributeWidget> {
             child: const Icon(Icons.copy_rounded, size: 17)),
       ],
     );
-  }
 
-  Widget _contextMenu() {
-    return PopupMenuButton(
+  Widget _contextMenu() => PopupMenuButton(
       color: Color.lerp(Colors.white, widget.account.color, 0.1),
       onSelected: _onContextMenu,
-      itemBuilder: (_) {
-        return [
-          _menuItem(Icons.label_important_outline, "Set As Main", "main"),
-          _menuItem(Icons.label_outline, "Set As Secondary", "secondary"),
-          _menuItem(Icons.edit_rounded, "Edit", "edit"),
+      itemBuilder: (_) => <PopupMenuItem<String>>[
+          _menuItem(Icons.label_important_outline, 'Set As Main', 'main'),
+          _menuItem(Icons.label_outline, 'Set As Secondary', 'secondary'),
+          _menuItem(Icons.edit_rounded, 'Edit', 'edit'),
           _menuItem(
-              Icons.visibility_outlined, "Toggle Sensitivity", "sensetive"),
-          _menuItem(Icons.delete_rounded, "Delete", "delete"),
-        ];
-      },
+              Icons.visibility_outlined, 'Toggle Sensitivity', 'sensetive'),
+          _menuItem(Icons.delete_rounded, 'Delete', 'delete'),
+        ],
     );
-  }
 
-  PopupMenuItem<String> _menuItem(IconData icon, String text, String value) {
-    return PopupMenuItem(
+  PopupMenuItem<String> _menuItem(IconData icon, String text, String value) => PopupMenuItem(
       value: value,
       child: Row(
         spacing: 5,
-        children: [
+        children: <Widget>[
           Icon(icon),
           Text(text),
         ],
       ),
     );
-  }
 
   void _toggleHidden(bool fromListener) {
     setState(() {
       isHidden = !isHidden;
     });
-    bool isListening = Shake.onShakeListeners
-        .containsKey("${widget.account.name}${widget.name}");
+    final bool isListening = Shake.onShakeListeners
+        .containsKey('${widget.account.name}${widget.name}');
     if (!isHidden && !isListening) {
-      Shake.onShakeListeners["${widget.account.name}${widget.name}"] =
+      Shake.onShakeListeners['${widget.account.name}${widget.name}'] =
           () => _toggleHidden(true);
     } else if (isHidden && isListening && !fromListener) {
-      Shake.onShakeListeners.remove("${widget.account.name}${widget.name}");
+      Shake.onShakeListeners.remove('${widget.account.name}${widget.name}');
     }
   }
 
   void _onContextMenu(String value) {
-    if (value == "edit") {
+    if (value == 'edit') {
       _showEditDialog();
-    } else if (value == "delete") {
+    } else if (value == 'delete') {
       _deleteAttribute();
-    } else if (value == "main") {
+    } else if (value == 'main') {
       _checkButtonClick(true, widget.account, widget.name);
-    } else if (value == "secondary") {
+    } else if (value == 'secondary') {
       _checkButtonClick(false, widget.account, widget.name);
-    } else if (value == "sensetive") {
+    } else if (value == 'sensetive') {
       isHidden = false;
       Provider.of<AccountNotifier>(
         context,

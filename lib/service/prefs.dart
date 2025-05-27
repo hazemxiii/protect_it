@@ -5,16 +5,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Prefs {
   static final Prefs _instance = Prefs._();
   late SharedPreferences _prefs;
-  static const String _dontShowAgain = "dontShowAgain";
-  static const String _accessToken = "accessToken";
-  static const String _username = "username";
-  static const String _password = "password";
-  static const String _cache = "cache";
-  static const String _bio = "bio";
-  static const String _pin = "pin";
-  static const String _expiresOn = "expiresOn";
-  static const String _offlineRequests = "offlineRequests";
-  static const String _key = "key";
+  static const String _dontShowAgain = 'dontShowAgain';
+  static const String _accessToken = 'accessToken';
+  static const String _username = 'username';
+  static const String _password = 'password';
+  static const String _cache = 'cache';
+  static const String _bio = 'bio';
+  static const String _pin = 'pin';
+  static const String _expiresOn = 'expiresOn';
+  static const String _offlineRequests = 'offlineRequests';
+  static const String _key = 'key';
 
   Prefs._();
 
@@ -66,7 +66,7 @@ class Prefs {
 
   void addOfflineRequest(OfflineRequest request) {
     _prefs.setStringList(_offlineRequests,
-        [..._prefs.getStringList(_offlineRequests) ?? [], request.toJSON()]);
+        <String>[..._prefs.getStringList(_offlineRequests) ?? <String>[], request.toJSON()]);
   }
 
   void removeOfflineRequest(OfflineRequest request) {
@@ -74,9 +74,9 @@ class Prefs {
         _offlineRequests,
         _prefs
                 .getStringList(_offlineRequests)
-                ?.where((e) => e != request.toJSON())
+                ?.where((String e) => e != request.toJSON())
                 .toList() ??
-            []);
+            <String>[]);
   }
 
   bool get isBioActive => _prefs.getBool(_bio) ?? false;
@@ -86,27 +86,21 @@ class Prefs {
   String? get key => _prefs.getString(_key);
   bool get isCached => _prefs.containsKey(_cache);
 
-  List<OfflineRequest> getOfflineRequests() {
-    return _prefs
+  List<OfflineRequest> getOfflineRequests() => _prefs
             .getStringList(_offlineRequests)
-            ?.map((e) => OfflineRequest.fromJSON(e))
+            ?.map((String e) => OfflineRequest.fromJSON(e))
             .toList() ??
-        [];
-  }
+        <OfflineRequest>[];
 
-  String getAccessToken() {
-    return _prefs.getString(_accessToken) ?? "";
-  }
+  String getAccessToken() => _prefs.getString(_accessToken) ?? '';
 
-  List<String> getCache() {
-    return _prefs.getStringList(_cache) ?? [];
-  }
+  List<String> getCache() => _prefs.getStringList(_cache) ?? <String>[];
 
   bool get isLoggedIn {
-    String? expDate = _prefs.getString(_expiresOn);
+    final String? expDate = _prefs.getString(_expiresOn);
 
     if (expDate == null) return false;
-    DateTime expireOn = DateTime.parse(expDate);
+    final DateTime expireOn = DateTime.parse(expDate);
     if (expireOn.isBefore(DateTime.now())) return false;
 
     return _prefs.getString(_username) != null &&
@@ -114,29 +108,25 @@ class Prefs {
         _prefs.getString(_accessToken) != null;
   }
 
-  bool getDontShowAgain() {
-    return _prefs.getBool(_dontShowAgain) ?? false;
-  }
+  bool getDontShowAgain() => _prefs.getBool(_dontShowAgain) ?? false;
 
-  RandomPass getRandomPass() {
-    return RandomPass(
-        upper: _prefs.getBool("upper") ?? true,
-        lower: _prefs.getBool("lower") ?? true,
-        nums: _prefs.getBool("nums") ?? true,
-        length: _prefs.getInt("length") ?? 13,
-        specialActive: _prefs.getBool("specialActive") ?? true,
-        special: _prefs.getStringList("special") ??
-            ["\$", "#", "@", "!", "~", "&", "*", "-", "_", "+", "=", "%"]);
-  }
+  RandomPass getRandomPass() => RandomPass(
+        upper: _prefs.getBool('upper') ?? true,
+        lower: _prefs.getBool('lower') ?? true,
+        nums: _prefs.getBool('nums') ?? true,
+        length: _prefs.getInt('length') ?? 13,
+        specialActive: _prefs.getBool('specialActive') ?? true,
+        special: _prefs.getStringList('special') ??
+            <String>['\$', '#', '@', '!', '~', '&', '*', '-', '_', '+', '=', '%']);
 
   Future<bool> saveRandomPassData(RandomPass r) async {
     bool success = true;
-    success = await _prefs.setBool("upper", r.upper);
-    success = await _prefs.setBool("lower", r.lower);
-    success = await _prefs.setBool("nums", r.nums);
-    success = await _prefs.setBool("specialActive", r.specialActive);
-    success = await _prefs.setInt("length", r.length);
-    success = await _prefs.setStringList("special", r.special);
+    success = await _prefs.setBool('upper', r.upper);
+    success = await _prefs.setBool('lower', r.lower);
+    success = await _prefs.setBool('nums', r.nums);
+    success = await _prefs.setBool('specialActive', r.specialActive);
+    success = await _prefs.setInt('length', r.length);
+    success = await _prefs.setStringList('special', r.special);
     return success;
   }
 

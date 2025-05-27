@@ -43,22 +43,20 @@ class _AppState extends State<App> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AccountNotifier(),
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+      create: (BuildContext context) => AccountNotifier(),
       child: MaterialApp(
         scaffoldMessengerKey: Backend().scaffoldMessengerKey,
         home: _buildChild(),
       ),
     );
-  }
 
   Widget _buildChild() {
     Widget child = const SignInPage();
     if (Prefs().isLoggedIn) {
       if (Prefs().pin != null && _bioFailed) {
         child = PinPage(
-            onSubmit: _onPinSubmit, title: "Enter Pin to continue", pin: null);
+            onSubmit: _onPinSubmit, title: 'Enter Pin to continue');
       } else {
         child = const AccountsPage();
       }
@@ -74,12 +72,12 @@ class _AppState extends State<App> {
     if (pinNot.value == Prefs().pin) {
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const AccountsPage()),
-          (route) => false);
+          MaterialPageRoute(builder: (BuildContext context) => const AccountsPage()),
+          (Route route) => false);
     } else {
-      pinNot.value = "";
+      pinNot.value = '';
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Invalid PIN")),
+        const SnackBar(content: Text('Invalid PIN')),
       );
     }
   }
@@ -89,21 +87,18 @@ class BioFailedPage extends StatelessWidget {
   const BioFailedPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
+  Widget build(BuildContext context) => const Scaffold(
       body: Center(
-        child: Text("Biometric Authentication Failed"),
+        child: Text('Biometric Authentication Failed'),
       ),
     );
-  }
 }
 
 class LoadingPage extends StatelessWidget {
   const LoadingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
+  Widget build(BuildContext context) => const Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: CircularProgressIndicator(
@@ -111,5 +106,4 @@ class LoadingPage extends StatelessWidget {
         ),
       ),
     );
-  }
 }

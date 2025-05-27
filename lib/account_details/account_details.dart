@@ -37,14 +37,13 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Color.lerp(widget.account.color, Colors.white, 0.9),
       appBar: AppBar(
         backgroundColor: Color.lerp(widget.account.color, Colors.white, 0.9),
         foregroundColor: Colors.black,
         centerTitle: true,
-        actions: [
+        actions: <Widget>[
           _button(Icons.add, _showEditDialog),
           _button(Icons.delete_outline_rounded, _showDeleteDialog),
         ],
@@ -52,7 +51,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: <Widget>[
             _section(true),
             _section(false),
             const SizedBox(
@@ -69,10 +68,10 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                 child: const Row(
                   spacing: 10,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: <Widget>[
                     Icon(Icons.cancel_outlined, color: Colors.black),
                     Text(
-                      "Cancel",
+                      'Cancel',
                       style: TextStyle(color: Colors.black),
                     ),
                   ],
@@ -83,7 +82,6 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
         ),
       ),
     );
-  }
 
   void _cancel() async {
     accountNotifer.cancel(widget.account, Account.fromJSON(accountBackUp)!);
@@ -93,7 +91,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   }
 
   void _showEditDialog() {
-    Map<String, Attribute> attr = accountNotifer.addAttribute(widget.account);
+    final Map<String, Attribute> attr = accountNotifer.addAttribute(widget.account);
     showDialog(
         context: context,
         builder: (_) => EditAttributeWidget(
@@ -103,31 +101,29 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   }
 
   void _onType(String? v) {
-    if ((v ?? "").trim() != "") {
+    if ((v ?? '').trim() != '') {
       accountNotifer.updateName(widget.account, v!);
     }
   }
 
-  IconButton _button(IconData icon, VoidCallback function) {
-    return IconButton(
+  IconButton _button(IconData icon, VoidCallback function) => IconButton(
         color: Colors.black, onPressed: function, icon: Icon(icon));
-  }
 
   void _showDeleteDialog() {
-    TextStyle style = TextStyle(color: widget.account.color);
+    final TextStyle style = TextStyle(color: widget.account.color);
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
               backgroundColor:
                   Color.lerp(Colors.white, widget.account.color, 0.2),
               title: Text(
-                "Are You Sure To Delete ${widget.account.name}?",
+                'Are You Sure To Delete ${widget.account.name}?',
                 style: style,
               ),
-              actions: [
+              actions: <Widget>[
                 TextButton(
                     onPressed: Navigator.of(context).pop,
-                    child: Text("Cancel", style: style)),
+                    child: Text('Cancel', style: style)),
                 TextButton(
                     onPressed: () {
                       accountNotifer.deleteAccount(widget.account);
@@ -135,17 +131,16 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (_) => Consumer(
-                                  builder: (context, accountNot, _) =>
+                                  builder: (BuildContext context, Object? accountNot, _) =>
                                       const AccountsPage())),
                           (_) => false);
                     },
-                    child: Text("Delete", style: style))
+                    child: Text('Delete', style: style))
               ],
             ));
   }
 
-  InkWell _colorButton() {
-    return InkWell(
+  InkWell _colorButton() => InkWell(
       onTap: _showColorPicker,
       child: Container(
         height: 20,
@@ -153,12 +148,11 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
         // margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
             border: const Border.fromBorderSide(
-                BorderSide(width: 3, color: Colors.black)),
+                BorderSide(width: 3)),
             color: widget.account.color,
             borderRadius: const BorderRadius.all(Radius.circular(999))),
       ),
     );
-  }
 
   void _showColorPicker() {
     showDialog(
@@ -167,7 +161,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
               content: SingleChildScrollView(
                 child: ColorPicker(
                     pickerColor: widget.account.color,
-                    onColorChanged: (c) {
+                    onColorChanged: (Color c) {
                       accountNotifer.updateColor(widget.account, c);
                     }),
               ),
@@ -184,8 +178,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     return AttributeType.normal;
   }
 
-  Widget _section(bool isMain) {
-    return Container(
+  Widget _section(bool isMain) => Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.all(10),
       width: double.infinity,
@@ -195,25 +188,24 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Row(
             spacing: 5,
-            children: [
+            children: <Widget>[
               if (isMain) _colorButton(),
               _sectionNameWidget(isMain),
             ],
           ),
-          Text(isMain ? "Main Details" : "Additional Details"),
+          Text(isMain ? 'Main Details' : 'Additional Details'),
           _buildSectionChildren(isMain)
         ],
       ),
     );
-  }
 
   Widget _sectionNameWidget(bool isMain) {
-    const style = TextStyle(
+    const TextStyle style = TextStyle(
         fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black);
-    var hintColor = Color.lerp(widget.account.color, Colors.white, 0.5);
+    final Color? hintColor = Color.lerp(widget.account.color, Colors.white, 0.5);
     if (isMain) {
       return Expanded(
         child: TextField(
@@ -223,21 +215,20 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
           style: style,
           decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Account Name",
+              hintText: 'Account Name',
               hintStyle: TextStyle(color: hintColor)),
         ),
       );
     }
-    return const Text("Additional Details", style: style);
+    return const Text('Additional Details', style: style);
   }
 
-  Widget _buildSectionChildren(bool isMain) {
-    return SingleChildScrollView(
+  Widget _buildSectionChildren(bool isMain) => SingleChildScrollView(
         child: Column(
             spacing: isMain ? 20 : 5,
             children: _getAttributes(isMain)
                 .entries
-                .map((e) => AccountAttributeWidget(
+                .map((MapEntry<String, Attribute> e) => AccountAttributeWidget(
                       account: widget.account,
                       attribute: e.value,
                       name: e.key,
@@ -245,10 +236,9 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                       showContextMenu: true,
                     ))
                 .toList()));
-  }
 
   Map<String, Attribute> _getAttributes(bool isMain) {
-    Map<String, Attribute> attributes = {};
+    final Map<String, Attribute> attributes = <String, Attribute>{};
     if (isMain) {
       attributes[widget.account.mainKey] = widget.account.mainAttr;
       if (widget.account.secAttr != null) {
@@ -256,8 +246,8 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
       }
       return attributes;
     }
-    for (var e in widget.account.attributes.entries) {
-      AttributeType type = _getType(e.key);
+    for (MapEntry<String, Attribute> e in widget.account.attributes.entries) {
+      final AttributeType type = _getType(e.key);
       if (type == AttributeType.normal) {
         attributes[e.key] = e.value;
       }

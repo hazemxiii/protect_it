@@ -9,18 +9,17 @@ class ChangeSecretDialog extends StatefulWidget {
 }
 
 class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
-  final _oldController = TextEditingController();
-  final _newController = TextEditingController();
-  final _confirmController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _oldController = TextEditingController();
+  final TextEditingController _newController = TextEditingController();
+  final TextEditingController _confirmController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _isHidden = true;
   bool _isLoading = false;
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
+  Widget build(BuildContext context) => AlertDialog(
       title: const Text(
-        "Change Secret Key",
+        'Change Secret Key',
         style: TextStyle(color: Colors.white),
       ),
       backgroundColor: Colors.black,
@@ -29,38 +28,37 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              _input(_oldController, _oldValidator, "Old Password"),
-              _input(_newController, _newValidator, "New Password"),
-              _input(_confirmController, _newValidator, "Confirm New Password")
+            children: <Widget>[
+              _input(_oldController, _oldValidator, 'Old Password'),
+              _input(_newController, _newValidator, 'New Password'),
+              _input(_confirmController, _newValidator, 'Confirm New Password')
             ],
           ),
         ),
       ),
       actions: !_isLoading
-          ? [
+          ? <Widget>[
               TextButton(
                   onPressed: Navigator.of(context).pop,
                   child: const Text(
-                    "Cancel",
+                    'Cancel',
                     style: TextStyle(color: Colors.white),
                   )),
               TextButton(
                   onPressed: _onSubmit,
                   child: const Text(
-                    "Change",
+                    'Change',
                     style: TextStyle(color: Colors.white),
                   ))
             ]
-          : [const CircularProgressIndicator(color: Colors.white)],
+          : <Widget>[const CircularProgressIndicator(color: Colors.white)],
     );
-  }
 
   TextFormField _input(
-      TextEditingController controller, dynamic validator, String hint) {
-    const border = UnderlineInputBorder(
-        borderSide: BorderSide(width: 1, color: Colors.white));
-    const focus = UnderlineInputBorder(
+      TextEditingController controller, validator, String hint) {
+    const UnderlineInputBorder border = UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.white));
+    const UnderlineInputBorder focus = UnderlineInputBorder(
         borderSide: BorderSide(width: 3, color: Colors.white));
     return TextFormField(
       obscureText: _isHidden,
@@ -79,16 +77,11 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
     );
   }
 
-  String? _oldValidator(String? v) {
-    // if (v != Encryption().secret) {
-    //   return "Wrong Secret Key";
-    // }
-    return null;
-  }
+  String? _oldValidator(String? v) => null;
 
   String? _newValidator(String? v) {
     if (_newController.text != _confirmController.text) {
-      return "Passwords Do not Match";
+      return 'Passwords Do not Match';
     }
     return null;
   }
@@ -104,7 +97,7 @@ class _ChangeSecretDialogState extends State<ChangeSecretDialog> {
       setState(() {
         _isLoading = true;
       });
-      String? error = await Backend()
+      final String? error = await Backend()
           .changePassword(_oldController.text, _newController.text);
       if (mounted) {
         if (error == null) {

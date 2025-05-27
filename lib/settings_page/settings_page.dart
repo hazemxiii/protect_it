@@ -24,66 +24,60 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: const Text('Settings'),
         centerTitle: true,
         foregroundColor: Colors.white,
         backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Column(
-          children: [
+          children: <Widget>[
             _accountSection(context),
             const PrivacySectionWidget(),
             const SettingsSectionWidget(
                 content: RandomPassWidget(),
-                title: "Password Generator",
-                hint: "")
+                title: 'Password Generator',
+                hint: '')
           ],
         ),
       ),
     );
-  }
 
-  Widget _accountSection(BuildContext context) {
-    return SettingsSectionWidget(
-      title: "Account Settings",
-      hint: "Change Your Security Key",
+  Widget _accountSection(BuildContext context) => SettingsSectionWidget(
+      title: 'Account Settings',
+      hint: 'Change Your Security Key',
       content: Row(
-        children: [
-          _accountBtn(context, "Change Password",
+        children: <Widget>[
+          _accountBtn(context, 'Change Password',
               () => _showChangeSecretDialog(context)),
           const VerticalDivider(
             width: 10,
           ),
-          _accountBtn(context, "Logout", () => _logout()),
+          _accountBtn(context, 'Logout', () => _logout()),
         ],
       ),
     );
-  }
 
-  Widget _accountBtn(BuildContext context, String text, VoidCallback fn) {
-    return MaterialButton(
+  Widget _accountBtn(BuildContext context, String text, VoidCallback fn) => MaterialButton(
         color: Colors.white,
         textColor: Colors.black,
         elevation: 0,
         hoverElevation: 0,
         shape: const RoundedRectangleBorder(
-            side: BorderSide(color: Colors.black),
+            side: BorderSide(),
             borderRadius: BorderRadius.all(Radius.circular(5))),
         onPressed: fn,
         child: Text(text));
-  }
 
   void _showChangeSecretDialog(BuildContext context) {
     showDialog(context: context, builder: (_) => const ChangeSecretDialog());
   }
 
   void _logout() async {
-    bool r = await Backend().logout();
+    final bool r = await Backend().logout();
     if (!mounted) return;
     if (r) {
       Provider.of<AccountNotifier>(context, listen: false).logout();
@@ -92,7 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
           MaterialPageRoute(builder: (_) => const SignInPage()), (_) => false);
     } else {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Logout Failed")));
+          .showSnackBar(const SnackBar(content: Text('Logout Failed')));
     }
   }
 }
@@ -108,8 +102,7 @@ class SettingsSectionWidget extends StatelessWidget {
       required this.hint});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       width: double.infinity,
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
@@ -119,7 +112,7 @@ class SettingsSectionWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Text(
             title,
             style: const TextStyle(
@@ -136,5 +129,4 @@ class SettingsSectionWidget extends StatelessWidget {
         ],
       ),
     );
-  }
 }

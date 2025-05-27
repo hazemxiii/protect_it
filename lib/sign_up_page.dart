@@ -9,32 +9,31 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   String? _usernameError;
   String? _passwordError;
   bool _isLoading = false;
   bool _showPassword = false;
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text("Sign Up"),
+        title: const Text('Sign Up'),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           spacing: 10,
-          children: [
-            _input("Username", _usernameController, _usernameError),
-            _input("Password", _passwordController, _passwordError,
+          children: <Widget>[
+            _input('Username', _usernameController, _usernameError),
+            _input('Password', _passwordController, _passwordError,
                 showPassword: _showPassword),
             _input(
-                "Confirm Password", _confirmPasswordController, _passwordError,
+                'Confirm Password', _confirmPasswordController, _passwordError,
                 showPassword: _showPassword),
             const SizedBox(height: 20),
             _btn(),
@@ -42,7 +41,6 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
-  }
 
   Widget _btn() {
     if (_isLoading) {
@@ -57,17 +55,17 @@ class _SignUpPageState extends State<SignUpPage> {
       textColor: Colors.white,
       color: Colors.black,
       onPressed: _register,
-      child: const Text("Sign Up"),
+      child: const Text('Sign Up'),
     );
   }
 
   Widget _input(
       String label, TextEditingController controller, String? errorMsg,
       {bool? showPassword}) {
-    bool error = errorMsg != null;
+    final bool error = errorMsg != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Container(
           // margin: const EdgeInsets.all(10),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -89,8 +87,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  InputDecoration inputDecoration(String label, bool? showPassword) {
-    return InputDecoration(
+  InputDecoration inputDecoration(String label, bool? showPassword) => InputDecoration(
         labelStyle: const TextStyle(color: Colors.grey),
         floatingLabelStyle: const TextStyle(color: Colors.black),
         labelText: label,
@@ -105,12 +102,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 },
                 icon: Icon(
                     showPassword ? Icons.visibility : Icons.visibility_off)));
-  }
 
   bool _validateUsername() {
     setState(() {
       if (_usernameController.text.length < 5) {
-        _usernameError = "Username must be at least 5 characters long";
+        _usernameError = 'Username must be at least 5 characters long';
       } else {
         _usernameError = null;
       }
@@ -121,9 +117,9 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _validatePassword() {
     setState(() {
       if (_passwordController.text.length < 2) {
-        _passwordError = "Password must be at least 2 characters long";
+        _passwordError = 'Password must be at least 2 characters long';
       } else if (_passwordController.text != _confirmPasswordController.text) {
-        _passwordError = "Passwords do not match";
+        _passwordError = 'Passwords do not match';
       } else {
         _passwordError = null;
       }
@@ -136,11 +132,11 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() {
         _isLoading = true;
       });
-      final error = await Backend()
+      final String? error = await Backend()
           .register(_usernameController.text, _passwordController.text);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error ?? "Account created successfully")),
+          SnackBar(content: Text(error ?? 'Account created successfully')),
         );
       }
       setState(() {

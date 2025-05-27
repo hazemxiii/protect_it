@@ -5,7 +5,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 class Shake {
   static StreamSubscription? stream;
-  static Map<String, VoidCallback> onShakeListeners = {};
+  static Map<String, VoidCallback> onShakeListeners = <String, VoidCallback>{};
   final int threshold = 20;
 
   void start() {
@@ -14,14 +14,14 @@ class Shake {
     stream = userAccelerometerEventStream().listen(
       (UserAccelerometerEvent event) {
         if (event.x > threshold || event.y > threshold || event.z > threshold) {
-          for (var listener in onShakeListeners.values) {
+          for (VoidCallback listener in onShakeListeners.values) {
             listener();
           }
           onShakeListeners.clear();
         }
       },
       onError: (error) {
-        debugPrint("Error detecting shake: ${error.toString()}");
+        debugPrint('Error detecting shake: ${error.toString()}');
       },
       cancelOnError: true,
     );

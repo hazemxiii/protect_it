@@ -10,8 +10,8 @@ class Account {
     String? id,
     required String name,
     required Map<String, Attribute> attributes,
-    String mainKey = "",
-    String secKey = "",
+    String mainKey = '',
+    String secKey = '',
     Color color = Colors.black,
   }) {
     _id = id ?? const Uuid().v4();
@@ -22,25 +22,25 @@ class Account {
     _name = name;
     String key = _name;
     while (names.containsKey(key)) {
-      key = "$key ";
+      key = '$key ';
     }
     names[key] = this;
-    List<String> keys = _attributes.keys.toList();
+    final List<String> keys = _attributes.keys.toList();
     if (!keys.contains(_mainKey)) {
       throw "Main Key Doesn't Exist for account $name";
     }
-    if (!keys.contains(_secKey) && _secKey != "") {
+    if (!keys.contains(_secKey) && _secKey != '') {
       throw "Secondary Key Doesn't Exist";
     }
   }
 
-  static Map<String, Account> names = {};
+  static Map<String, Account> names = <String, Account>{};
   late String _id;
   late String _name;
   late String _mainKey;
   late String _secKey;
   late Color _color;
-  late Map<String, Attribute> _attributes = {};
+  late Map<String, Attribute> _attributes = <String, Attribute>{};
 
   // String toJSON() {
   //   Encryption en = Encryption();
@@ -59,14 +59,14 @@ class Account {
   // }
 
   String toJSON() {
-    Encryption en = Encryption();
-    Map<String, dynamic> map = {};
+    final Encryption en = Encryption();
+    final Map<String, dynamic> map = {};
     map['id'] = _id;
     map['name'] = _name;
     map['color'] = _color.toARGB32().toString();
     map['mainKey'] = _mainKey;
     map['attributes'] = {};
-    if (_secKey != "") {
+    if (_secKey != '') {
       map['secKey'] = _secKey;
     }
     for (String attr in attributes.keys) {
@@ -77,17 +77,17 @@ class Account {
 
   static Account? fromJSON(String json) {
     try {
-      Encryption en = Encryption();
-      Map map = jsonDecode(en.decryptData(json));
-      Map<String, Attribute> attributes = {};
-      String id = map.remove('id')!;
-      String mainKey = map.remove('mainKey');
-      String name = map.remove('name')!;
-      Color color = Color(int.parse(map.remove('color')!));
-      String secKey = map.remove('secKey') ?? "";
-      Map<String, dynamic> attributesMap = map.remove('attributes')!;
+      final Encryption en = Encryption();
+      final Map map = jsonDecode(en.decryptData(json));
+      final Map<String, Attribute> attributes = <String, Attribute>{};
+      final String id = map.remove('id')!;
+      final String mainKey = map.remove('mainKey');
+      final String name = map.remove('name')!;
+      final Color color = Color(int.parse(map.remove('color')!));
+      final String secKey = map.remove('secKey') ?? '';
+      final Map<String, dynamic> attributesMap = map.remove('attributes')!;
       for (String key in attributesMap.keys) {
-        Attribute? attr = Attribute.fromJSON(attributesMap[key]);
+        final Attribute? attr = Attribute.fromJSON(attributesMap[key]);
         if (attr == null) {
           return null;
         }
@@ -102,7 +102,7 @@ class Account {
           secKey: secKey,
           color: color);
     } catch (e) {
-      debugPrint("Error in Decrypting Account: ${e.toString()}");
+      debugPrint('Error in Decrypting Account: ${e.toString()}');
       return null;
     }
   }
@@ -116,10 +116,10 @@ class Account {
       if (_attributes.length <= 1) {
         return null;
       }
-      List<String> attributes = _attributes.keys.toList();
+      final List<String> attributes = _attributes.keys.toList();
       attributes.remove(_mainKey);
       if (_attributes.length == 1) {
-        _secKey = "";
+        _secKey = '';
         _mainKey = attributes[0];
       } else {
         attributes.remove(_secKey);
@@ -127,7 +127,7 @@ class Account {
       }
     }
     if (attributeName == _secKey) {
-      _secKey = "";
+      _secKey = '';
     }
     return _attributes.remove(attributeName);
   }
@@ -141,21 +141,19 @@ class Account {
 
   void setSec(String secKey) {
     if (_mainKey == secKey) {
-      if (_secKey == "") {
+      if (_secKey == '') {
         return;
       }
       _mainKey = _secKey;
     }
     if (_secKey == secKey) {
-      _secKey = "";
+      _secKey = '';
     } else {
       _secKey = secKey;
     }
   }
 
-  bool isAttributeExist(String key) {
-    return _attributes.keys.toList().contains(key);
-  }
+  bool isAttributeExist(String key) => _attributes.keys.toList().contains(key);
 
   void updateColor(Color c) {
     _color = c;

@@ -29,8 +29,7 @@ class _AccountsPageState extends State<AccountsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
@@ -39,7 +38,7 @@ class _AccountsPageState extends State<AccountsPage> {
       ),
       backgroundColor: Colors.white,
       appBar: AppBar(
-        actions: [
+        actions: <Widget>[
           IconButton(
               color: Colors.black,
               onPressed: () => Navigator.of(context).push(
@@ -50,23 +49,22 @@ class _AccountsPageState extends State<AccountsPage> {
         foregroundColor: Colors.black,
         title: const SearchWidget(),
       ),
-      body: Consumer<AccountNotifier>(builder: (context, accountNot, _) {
+      body: Consumer<AccountNotifier>(builder: (BuildContext context, AccountNotifier accountNot, _) {
         if (accountNot.loading) {
           return const Center(
               child: CircularProgressIndicator(color: Colors.black));
         }
-        List<Account> accounts = accountNot.accounts();
+        final List<Account> accounts = accountNot.accounts();
         if (accounts.isEmpty) {
           if (accountNot.searchQ.isNotEmpty) {
             return const Center(
-                child: Text("No accounts found",
+                child: Text('No accounts found',
                     style: TextStyle(color: Colors.grey, fontSize: 30)));
           }
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [
+              children: <Widget>[
                 const Icon(
                   Icons.account_circle_outlined,
                   size: 100,
@@ -74,7 +72,7 @@ class _AccountsPageState extends State<AccountsPage> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  "No accounts yet",
+                  'No accounts yet',
                   style: TextStyle(
                     fontSize: 24,
                     color: Colors.grey[700],
@@ -83,7 +81,7 @@ class _AccountsPageState extends State<AccountsPage> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Add your first account using the + button",
+                  'Add your first account using the + button',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[500],
@@ -101,29 +99,23 @@ class _AccountsPageState extends State<AccountsPage> {
                 mainAxisSpacing: 10),
             padding: const EdgeInsets.all(10),
             itemCount: accounts.length,
-            itemBuilder: (context, index) {
-              return AccountWidget(account: accounts[index]);
-            });
+            itemBuilder: (BuildContext context, int index) => AccountWidget(account: accounts[index]));
       }),
     );
-  }
 
   void _addAccount(BuildContext context) {
-    Account account = Account(
-        color: Colors.black,
-        mainKey: "userName",
-        secKey: "password",
-        name: "Account",
-        attributes: {
-          "userName": Attribute(value: "userName"),
-          "password": Attribute(value: "password", isSensitive: true)
+    final Account account = Account(
+        mainKey: 'userName',
+        secKey: 'password',
+        name: 'Account',
+        attributes: <String, Attribute>{
+          'userName': Attribute(value: 'userName'),
+          'password': Attribute(value: 'password', isSensitive: true)
         });
     Provider.of<AccountNotifier>(context, listen: false).addAccount(account);
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) =>
-            Consumer<AccountNotifier>(builder: (context, accountNotifier, _) {
-              return AccountDetailsPage(account: account);
-            })));
+            Consumer<AccountNotifier>(builder: (BuildContext context, AccountNotifier accountNotifier, _) => AccountDetailsPage(account: account))));
   }
 }
 
@@ -173,16 +165,14 @@ class _SearchWidgetState extends State<SearchWidget>
     super.dispose();
   }
 
-  final _border = const OutlineInputBorder(
+  final OutlineInputBorder _border = const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(999)),
       borderSide: BorderSide(color: Colors.transparent));
 
-  final _iconWidth = 45.0;
+  final double _iconWidth = 45.0;
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<AccountNotifier>(builder: (context, accountNot, _) {
-      return ConstrainedBox(
+  Widget build(BuildContext context) => Consumer<AccountNotifier>(builder: (BuildContext context, AccountNotifier accountNot, _) => ConstrainedBox(
         constraints: BoxConstraints(
             maxHeight: _iconWidth,
             maxWidth: _animation.value * 2300 + _iconWidth),
@@ -191,7 +181,7 @@ class _SearchWidgetState extends State<SearchWidget>
           cursorColor: Colors.black,
           style: const TextStyle(color: Colors.black),
           decoration: InputDecoration(
-            hintText: "Search",
+            hintText: 'Search',
             hintStyle: const TextStyle(color: Colors.grey),
             suffixIcon: SizedBox(
               width: _iconWidth,
@@ -210,19 +200,17 @@ class _SearchWidgetState extends State<SearchWidget>
             focusedBorder: _border,
           ),
           controller: controller,
-          onChanged: (v) {
+          onChanged: (String v) {
             accountNot.updateSearchQ(v);
           },
         ),
-      );
-    });
-  }
+      ));
 
   void _iconPressed() {
     if (focusNode.hasFocus) {
       controller.clear();
       focusNode.unfocus();
-      Provider.of<AccountNotifier>(context, listen: false).updateSearchQ("");
+      Provider.of<AccountNotifier>(context, listen: false).updateSearchQ('');
     } else {
       focusNode.requestFocus();
     }

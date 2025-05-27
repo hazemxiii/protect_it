@@ -25,8 +25,8 @@ class _SecretCodePageState extends State<SecretCodePage> {
 
   @override
   Widget build(BuildContext context) {
-    UnderlineInputBorder border =
-        const UnderlineInputBorder(borderSide: BorderSide());
+    const UnderlineInputBorder border =
+        UnderlineInputBorder();
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -35,7 +35,7 @@ class _SecretCodePageState extends State<SecretCodePage> {
           constraints: const BoxConstraints(maxWidth: 600),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: <Widget>[
               TextField(
                 obscureText: !isVisible,
                 controller: secretController,
@@ -48,7 +48,7 @@ class _SecretCodePageState extends State<SecretCodePage> {
                             ? Icons.visibility
                             : Icons.visibility_off)),
                     label: const Text(
-                      "Secret Key",
+                      'Secret Key',
                       style:
                           TextStyle(color: Color.fromARGB(255, 158, 158, 158)),
                     ),
@@ -74,9 +74,9 @@ class _SecretCodePageState extends State<SecretCodePage> {
                     padding: const EdgeInsets.all(8),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                      children: <Widget>[
                         Text(
-                          "Enter",
+                          'Enter',
                           style: TextStyle(color: Colors.white),
                         ),
                         VerticalDivider(
@@ -102,7 +102,7 @@ class _SecretCodePageState extends State<SecretCodePage> {
   void _login(BuildContext context, String secret) async {
     Encryption().setSecret(secret);
 
-    bool isCorrect =
+    final bool isCorrect =
         await Provider.of<AccountNotifier>(context, listen: false).getData();
 
     if (isCorrect) {
