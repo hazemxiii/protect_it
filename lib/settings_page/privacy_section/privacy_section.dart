@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:protect_it/pin_page.dart';
-import 'package:protect_it/service/backend.dart';
 import 'package:protect_it/service/bio.dart';
 import 'package:protect_it/service/prefs.dart';
+import 'package:protect_it/service/secure_storage.dart';
 import 'package:protect_it/settings_page/privacy_section/privacy_section_button.dart';
 import 'package:protect_it/settings_page/settings_page.dart';
 
@@ -16,31 +16,31 @@ class PrivacySectionWidget extends StatefulWidget {
 class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
   @override
   Widget build(BuildContext context) => SettingsSectionWidget(
-        content: Column(
-          children: <Widget>[
-            PrivacySectionButton(
-                getValue: _getOtp, onPressed: (bool v) => _setOtp(v), text: 'OTP'),
-            PrivacySectionButton(
-                getValue: () => Future.value(Prefs().pin != null),
-                text: 'Pin',
-                onPressed: (bool v) => _setPin(v)),
-            FutureBuilder(
-                future: Bio().bioIsAvailable(),
-                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                  if (snapshot.hasData && snapshot.data == true) {
-                    return PrivacySectionButton(
-                        getValue: _getBiometric,
-                        text: 'Biometric',
-                        onPressed: (bool v) => _setBiometric(v));
-                  }
-                  return const SizedBox.shrink();
-                }),
-          ],
-        ),
-        title: 'Privacy Settings',
-        hint: 'Extra Privacy Steps');
+      content: Column(
+        children: <Widget>[
+          // PrivacySectionButton(
+          //     getValue: _getOtp, onPressed: (bool v) => _setOtp(v), text: 'OTP'),
+          PrivacySectionButton(
+              getValue: () => Future.value(SecureStorage().pin.isNotEmpty),
+              text: 'Pin',
+              onPressed: (bool v) => _setPin(v)),
+          FutureBuilder(
+              future: Bio().bioIsAvailable(),
+              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                if (snapshot.hasData && snapshot.data == true) {
+                  return PrivacySectionButton(
+                      getValue: _getBiometric,
+                      text: 'Biometric',
+                      onPressed: (bool v) => _setBiometric(v));
+                }
+                return const SizedBox.shrink();
+              }),
+        ],
+      ),
+      title: 'Privacy Settings',
+      hint: 'Extra Privacy Steps');
 
-  Future<bool> _getOtp() async => await Backend().otpEnabled;
+  // Future<bool> _getOtp() async => await Backend().otpEnabled;
 
   Future<bool> _getBiometric() async {
     if (await Bio().bioIsNotEmpty()) {
@@ -49,16 +49,18 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
     return false;
   }
 
-  Future<bool?> _setOtp(bool v) async {
-    final bool? b = await Backend().setOtp(v);
-    if (b == null) {
-      return null;
-    }
-    return b;
-  }
+  // Future<bool?> _setOtp(bool v) async {
+  //   final bool? b = await Backend().setOtp(v);
+  //   if (b == null) {
+  //     return null;
+  //   }
+  //   return b;
+  // }
 
   Future<bool?> _setBiometric(bool v) async {
-    if (Prefs().pin == null) {
+    // if (Prefs().pin == null) {
+    if (SecureStorage().pin.isEmpty) {
+      if (!mounted) return null;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please set a pin first')),
       );
@@ -70,14 +72,15 @@ class _PrivacySectionWidgetState extends State<PrivacySectionWidget> {
 
   Future<bool?> _setPin(bool v) async {
     if (!v) {
-      Prefs().setPin(null);
+      await Prefs().setPin(null);
     } else {
       final String? r = await _getNewPin();
       if (r != null) {
-        Prefs().setPin(r);
+        await Prefs().setPin(r);
       }
     }
-    return Prefs().pin != null;
+    return SecureStorage().pin.isNotEmpty;
+    // return Prefs().pin != null;
   }
 
   Future<String?> _getNewPin() async {

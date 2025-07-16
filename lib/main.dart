@@ -4,6 +4,7 @@ import 'package:protect_it/pin_page.dart';
 import 'package:protect_it/service/account_notifier.dart';
 import 'package:protect_it/service/bio.dart';
 import 'package:protect_it/service/prefs.dart';
+import 'package:protect_it/service/secure_storage.dart';
 import 'package:protect_it/sign_in_page.dart';
 import 'package:provider/provider.dart';
 import 'package:protect_it/service/backend.dart';
@@ -11,6 +12,7 @@ import 'package:protect_it/service/backend.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Prefs().init();
+  await SecureStorage().init();
   runApp(const App());
 }
 
@@ -23,7 +25,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   bool _loading = true;
-  bool _bioFailed = false;
+  bool _bioFailed = true;
 
   @override
   void initState() {
@@ -44,19 +46,18 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
-      create: (BuildContext context) => AccountNotifier(),
-      child: MaterialApp(
-        scaffoldMessengerKey: Backend().scaffoldMessengerKey,
-        home: _buildChild(),
-      ),
-    );
+        create: (BuildContext context) => AccountNotifier(),
+        child: MaterialApp(
+          scaffoldMessengerKey: Backend().scaffoldMessengerKey,
+          home: _buildChild(),
+        ),
+      );
 
   Widget _buildChild() {
     Widget child = const SignInPage();
     if (Prefs().isLoggedIn) {
-      if (Prefs().pin != null && _bioFailed) {
-        child = PinPage(
-            onSubmit: _onPinSubmit, title: 'Enter Pin to continue');
+      if (SecureStorage().pin.isNotEmpty && _bioFailed) {
+        child = PinPage(onSubmit: _onPinSubmit, title: 'Enter Pin to continue');
       } else {
         child = const AccountsPage();
       }
@@ -68,11 +69,14 @@ class _AppState extends State<App> {
   }
 
   void _onPinSubmit(ValueNotifier<String> pinNot, BuildContext context,
-      {String? pin}) {
-    if (pinNot.value == Prefs().pin) {
+      {String? pin}) async {
+    final String p = SecureStorage().pin;
+    if (!context.mounted) return;
+    if (pinNot.value == p) {
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => const AccountsPage()),
+          MaterialPageRoute(
+              builder: (BuildContext context) => const AccountsPage()),
           (Route route) => false);
     } else {
       pinNot.value = '';
@@ -88,10 +92,10 @@ class BioFailedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Scaffold(
-      body: Center(
-        child: Text('Biometric Authentication Failed'),
-      ),
-    );
+        body: Center(
+          child: Text('Biometric Authentication Failed'),
+        ),
+      );
 }
 
 class LoadingPage extends StatelessWidget {
@@ -99,11 +103,11 @@ class LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: CircularProgressIndicator(
-          color: Colors.black,
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Colors.black,
+          ),
         ),
-      ),
-    );
+      );
 }

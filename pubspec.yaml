@@ -49,6 +49,7 @@ dependencies:
   pointycastle: ^3.9.1
   convert: ^3.1.1
   sensors_plus: ^6.1.1
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3

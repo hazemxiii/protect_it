@@ -6,6 +6,7 @@ import 'package:protect_it/models/account.dart';
 import 'package:protect_it/models/offline_request.dart';
 import 'package:protect_it/service/encryption.dart';
 import 'package:protect_it/service/prefs.dart';
+import 'package:protect_it/service/secure_storage.dart';
 import 'package:protect_it/widgets/logout_snackbar.dart';
 
 class Backend {
@@ -21,15 +22,17 @@ class Backend {
       bool authorized = true,
       String? requestType}) async {
     const bool secure = kReleaseMode;
-    const String mainPath = secure ? 'account-safe-api.vercel.app' : '127.0.0.1:5000';
+    const String mainPath =
+        secure ? 'account-safe-api.vercel.app' : '127.0.0.1:5000';
     data ??= {};
     try {
-      final Uri url = secure ? Uri.https(mainPath, path) : Uri.http(mainPath, path);
+      final Uri url =
+          secure ? Uri.https(mainPath, path) : Uri.http(mainPath, path);
       final http.Response response = await http.post(url,
           headers: <String, String>{
             'Content-Type': 'application/json',
-            if (Prefs().getAccessToken().isNotEmpty)
-              'Authorization': 'Bearer ${Prefs().getAccessToken()}'
+            if (SecureStorage().accessToken.isNotEmpty)
+              'Authorization': 'Bearer ${SecureStorage().accessToken}'
           },
           body: jsonEncode(data));
       final dynamic r = jsonDecode(response.body);
@@ -98,7 +101,7 @@ class Backend {
         if (decryptedKey == null) {
           return 'Unknown Error';
         }
-        Prefs().login(
+        await Prefs().login(
             username,
             password,
             r.data['access_token'],
@@ -135,7 +138,7 @@ class Backend {
         return 'Unknown Error';
       }
       Prefs().login(
-          Prefs().username!,
+          SecureStorage().username,
           newPassword,
           r.data['access_token'],
           DateTime.now().add(Duration(seconds: r.data['expires_in'])),
@@ -214,10 +217,10 @@ class Backend {
   }
 
   SnackBar _signOutWidget() => SnackBar(
-        duration: const Duration(seconds: 5),
-        backgroundColor: Color.lerp(Colors.blue, Colors.white, 0.9),
-        behavior: SnackBarBehavior.floating,
-        content: const LogoutSnackbar());
+      duration: const Duration(seconds: 5),
+      backgroundColor: Color.lerp(Colors.blue, Colors.white, 0.9),
+      behavior: SnackBarBehavior.floating,
+      content: const LogoutSnackbar());
 
   Future<bool> get otpEnabled async {
     if (_otpEnabled != null) {

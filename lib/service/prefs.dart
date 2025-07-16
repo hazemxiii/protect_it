@@ -1,20 +1,16 @@
 import 'package:protect_it/models/offline_request.dart';
 import 'package:protect_it/service/random_pass.dart';
+import 'package:protect_it/service/secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Prefs {
   static final Prefs _instance = Prefs._();
-  late SharedPreferences _prefs;
+  late final SharedPreferences _prefs;
   static const String _dontShowAgain = 'dontShowAgain';
-  static const String _accessToken = 'accessToken';
-  static const String _username = 'username';
-  static const String _password = 'password';
   static const String _cache = 'cache';
   static const String _bio = 'bio';
-  static const String _pin = 'pin';
   static const String _expiresOn = 'expiresOn';
   static const String _offlineRequests = 'offlineRequests';
-  static const String _key = 'key';
 
   Prefs._();
 
@@ -28,11 +24,11 @@ class Prefs {
     _prefs.setBool(_bio, v);
   }
 
-  void setPin(String? pin) {
+  Future<void> setPin(String? pin) async {
     if (pin == null) {
-      _prefs.remove(_pin);
+      await SecureStorage().deletePin();
     } else {
-      _prefs.setString(_pin, pin);
+      await SecureStorage().setPin(pin);
     }
   }
 
@@ -40,33 +36,15 @@ class Prefs {
     _prefs.setBool(_dontShowAgain, v);
   }
 
-  void setAccessToken(String token) {
-    _prefs.setString(_accessToken, token);
-  }
-
-  void setKey(String key) {
-    _prefs.setString(_key, key);
-  }
-
   void setCache(List<String> cache) {
     _prefs.setStringList(_cache, cache);
   }
 
-  void setExpireOn(DateTime expireOn) {
-    _prefs.setString(_expiresOn, expireOn.toIso8601String());
-  }
-
-  void setUsername(String username) {
-    _prefs.setString(_username, username);
-  }
-
-  void setPassword(String password) {
-    _prefs.setString(_password, password);
-  }
-
   void addOfflineRequest(OfflineRequest request) {
-    _prefs.setStringList(_offlineRequests,
-        <String>[..._prefs.getStringList(_offlineRequests) ?? <String>[], request.toJSON()]);
+    _prefs.setStringList(_offlineRequests, <String>[
+      ..._prefs.getStringList(_offlineRequests) ?? <String>[],
+      request.toJSON()
+    ]);
   }
 
   void removeOfflineRequest(OfflineRequest request) {
@@ -80,19 +58,14 @@ class Prefs {
   }
 
   bool get isBioActive => _prefs.getBool(_bio) ?? false;
-  String? get username => _prefs.getString(_username);
-  String? get pin => _prefs.getString(_pin);
-  String? get password => _prefs.getString(_password);
-  String? get key => _prefs.getString(_key);
   bool get isCached => _prefs.containsKey(_cache);
 
-  List<OfflineRequest> getOfflineRequests() => _prefs
-            .getStringList(_offlineRequests)
-            ?.map((String e) => OfflineRequest.fromJSON(e))
-            .toList() ??
-        <OfflineRequest>[];
-
-  String getAccessToken() => _prefs.getString(_accessToken) ?? '';
+  List<OfflineRequest> getOfflineRequests() =>
+      _prefs
+          .getStringList(_offlineRequests)
+          ?.map((String e) => OfflineRequest.fromJSON(e))
+          .toList() ??
+      <OfflineRequest>[];
 
   List<String> getCache() => _prefs.getStringList(_cache) ?? <String>[];
 
@@ -103,21 +76,34 @@ class Prefs {
     final DateTime expireOn = DateTime.parse(expDate);
     if (expireOn.isBefore(DateTime.now())) return false;
 
-    return _prefs.getString(_username) != null &&
-        _prefs.getString(_password) != null &&
-        _prefs.getString(_accessToken) != null;
+    return SecureStorage().username.isNotEmpty &&
+        SecureStorage().password.isNotEmpty &&
+        SecureStorage().accessToken.isNotEmpty;
   }
 
   bool getDontShowAgain() => _prefs.getBool(_dontShowAgain) ?? false;
 
   RandomPass getRandomPass() => RandomPass(
-        upper: _prefs.getBool('upper') ?? true,
-        lower: _prefs.getBool('lower') ?? true,
-        nums: _prefs.getBool('nums') ?? true,
-        length: _prefs.getInt('length') ?? 13,
-        specialActive: _prefs.getBool('specialActive') ?? true,
-        special: _prefs.getStringList('special') ??
-            <String>['\$', '#', '@', '!', '~', '&', '*', '-', '_', '+', '=', '%']);
+      upper: _prefs.getBool('upper') ?? true,
+      lower: _prefs.getBool('lower') ?? true,
+      nums: _prefs.getBool('nums') ?? true,
+      length: _prefs.getInt('length') ?? 13,
+      specialActive: _prefs.getBool('specialActive') ?? true,
+      special: _prefs.getStringList('special') ??
+          <String>[
+            '\$',
+            '#',
+            '@',
+            '!',
+            '~',
+            '&',
+            '*',
+            '-',
+            '_',
+            '+',
+            '=',
+            '%'
+          ]);
 
   Future<bool> saveRandomPassData(RandomPass r) async {
     bool success = true;
@@ -130,19 +116,20 @@ class Prefs {
     return success;
   }
 
-  void login(String username, String password, String token, DateTime expireOn,
-      String key) {
-    _prefs.setString(_username, username);
-    _prefs.setString(_password, password);
-    _prefs.setString(_accessToken, token);
+  Future<void> login(String username, String password, String token,
+      DateTime expireOn, String key) async {
+    await SecureStorage().setUsername(username);
+    await SecureStorage().setPassword(password);
+    await SecureStorage().setAccessToken(token);
     _prefs.setString(_expiresOn, expireOn.toIso8601String());
-    _prefs.setString(_key, key);
+    await SecureStorage().setKey(key);
   }
 
   void logout() {
-    _prefs.remove(_accessToken);
-    _prefs.remove(_username);
-    _prefs.remove(_password);
+    SecureStorage().deleteAccessToken();
+    SecureStorage().deleteUsername();
+    SecureStorage().deleteKey();
+    SecureStorage().deletePassword();
     _prefs.remove(_cache);
   }
 }

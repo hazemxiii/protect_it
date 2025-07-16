@@ -31,12 +31,13 @@ linter:
     prefer_if_null_operators: true
     prefer_is_empty: true
     prefer_null_aware_operators: true
-    
+    avoid_print: true
+
     # Performance
     avoid_function_literals_in_foreach_calls: true
     avoid_unnecessary_containers: true
     prefer_collection_literals: true
-    
+
     # Best Practices
     always_declare_return_types: true
     always_require_non_null_named_parameters: true
@@ -54,29 +55,27 @@ linter:
     prefer_adjacent_string_concatenation: true
     prefer_typing_uninitialized_variables: true
     prefer_void_to_null: true
-    
+
     # Documentation
     # public_member_api_docs: true
-    
+
     # Error Handling
     avoid_catching_errors: true
     avoid_redundant_argument_values: true
     avoid_renaming_method_parameters: true
     avoid_shadowing_type_parameters: true
     avoid_type_to_string: true
-    
+
     # Testing
     avoid_annotating_with_dynamic: true
     # avoid_dynamic_calls: true
-    
+
     # Flutter Specific
     prefer_generic_function_type_aliases: true
     prefer_const_constructors_in_immutables: true
     prefer_expression_function_bodies: true
-    
+
     # Disabled Rules
     # These rules are disabled based on project needs
-    avoid_print: false
-
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
